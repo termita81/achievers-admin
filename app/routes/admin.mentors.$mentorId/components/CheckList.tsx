@@ -1,4 +1,4 @@
-import { useSubmit } from "react-router";
+import { useFetcher } from "react-router";
 import dayjs from "dayjs";
 import {
   Sparks,
@@ -72,21 +72,24 @@ export function CheckList({
   approvalbyMRCCompleted,
   volunteerAgreementSignedOn,
 }: Props) {
-  const submit = useSubmit();
+  // A fetcher submits independently of navigation, so deleting a checklist item
+  // does not disturb the profile edit form's state (edit mode / unsaved edits).
+  const fetcher = useFetcher();
 
   const referencesCompleted = references.filter(
     (ref) => ref.calledOndate !== null,
   ).length;
 
-  const submitDelete = (action: string) => () => {
-    if (!confirm(`Are you sure you want to delete this '${action}'?`)) {
+  const submitDelete = (check: string) => () => {
+    if (!confirm(`Are you sure you want to delete this '${check}'?`)) {
       return;
     }
 
     const formData = new FormData();
-    formData.append("action", action);
+    formData.append("intent", "delete-check");
+    formData.append("check", check);
 
-    void submit(formData, {
+    void fetcher.submit(formData, {
       method: "DELETE",
     });
   };

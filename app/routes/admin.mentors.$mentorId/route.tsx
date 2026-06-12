@@ -76,61 +76,96 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   };
 }
 
-export async function action({ request, params }: Route.ActionArgs) {
-  invariant(params.mentorId, "mentorId not found");
+interface ActionResult {
+  intent: "delete-check" | "profile-picture" | "profile-details";
+  successMessage: string | null;
+  errorMessage: string | null;
+}
 
-  if (request.method === "DELETE") {
-    const formDataDelete = await request.formData();
+async function deleteCheck(
+  mentorId: number,
+  formData: FormData,
+): Promise<ActionResult> {
+  const intent = "delete-check";
+  const check = formData.get("check")?.toString();
 
-    const action = formDataDelete.get("action")!.toString();
-    switch (action) {
-      case "welcomeCall":
-        await removeWelcomeCall(Number(params.mentorId));
-        break;
+  switch (check) {
+    case "welcomeCall":
+      await removeWelcomeCall(mentorId);
+      break;
 
-      case "induction":
-        await removeInduction(Number(params.mentorId));
-        break;
+    case "induction":
+      await removeInduction(mentorId);
+      break;
 
-      case "police-check":
-        await removePoliceCheck(Number(params.mentorId));
-        break;
+    case "police-check":
+      await removePoliceCheck(mentorId);
+      break;
 
-      case "wwc-check":
-        await removeWwccheck(Number(params.mentorId));
-        break;
+    case "wwc-check":
+      await removeWwccheck(mentorId);
+      break;
 
-      case "approval-mrc":
-        await removeApprovalMrc(Number(params.mentorId));
-        break;
-    }
+    case "approval-mrc":
+      await removeApprovalMrc(mentorId);
+      break;
+
+    default:
+      return {
+        intent,
+        successMessage: null,
+        errorMessage: `Unknown check: "${check}"`,
+      };
+  }
+
+  return {
+    intent,
+    successMessage: "Deleted successfully!",
+    errorMessage: null,
+  };
+}
+
+async function updateProfilePicture(
+  mentorId: number,
+  formData: FormData,
+): Promise<ActionResult> {
+  const intent = "profile-picture";
+  const profilePicture = formData.get("profilePicture");
+
+  if (profilePicture === "DELETE") {
+    await deleteUserProfilePicture(mentorId);
 
     return {
-      successMessage: "Deleted successfully!",
+      intent,
+      successMessage: "Profile picture deleted successfully!",
       errorMessage: null,
     };
   }
 
-  const formData = await parseFormData(request, uploadHandler);
-
-  const profilePicture = formData.get("profilePicture");
-  if (profilePicture === "DELETE") {
-    await deleteUserProfilePicture(Number(params.mentorId));
-
-    return {
-      successMessage: "Profile picture deleted successfully!",
-      errorMessage: null,
-    };
-  } else if (profilePicture instanceof File) {
-    await saveUserProfilePicture(Number(params.mentorId), profilePicture);
+  if (profilePicture instanceof File && profilePicture.size > 0) {
+    await saveUserProfilePicture(mentorId, profilePicture);
 
     memoryHandlerDispose("profilePicture");
 
     return {
+      intent,
       successMessage: "Profile picture updated successfully!",
       errorMessage: null,
     };
   }
+
+  return {
+    intent,
+    successMessage: null,
+    errorMessage: "No profile picture provided.",
+  };
+}
+
+async function updateProfileDetails(
+  mentorId: number,
+  formData: FormData,
+): Promise<ActionResult> {
+  const intent = "profile-details";
 
   const chapterId = formData.get("chapterId")?.toString();
   const firstName = formData.get("firstName")?.toString();
@@ -147,7 +182,7 @@ export async function action({ request, params }: Route.ActionArgs) {
   const dateOfBirth = formData.get("dateOfBirth")?.toString();
   const additionalEmail = formData.get("additionalEmail")?.toString();
 
-  const frequency = formData.get("frequency")!.toString();
+  const frequency = formData.get("frequency")?.toString() ?? "";
 
   const emergencyContactName = formData.get("emergencyContactName")?.toString();
   const emergencyContactNumber = formData
@@ -173,7 +208,11 @@ export async function action({ request, params }: Route.ActionArgs) {
     isStringNullOrEmpty(addressState) ||
     isStringNullOrEmpty(addressPostcode)
   ) {
-    throw new Error("Missing required fields.");
+    return {
+      intent,
+      successMessage: null,
+      errorMessage: "Missing required fields.",
+    };
   }
 
   const dataCreate: MentorCommand = {
@@ -201,18 +240,61 @@ export async function action({ request, params }: Route.ActionArgs) {
     hasApprovedToPublishPhotos: hasApprovedToPublishPhotos === "true",
   };
 
-  await updateMentorByIdAsync(Number(params.mentorId), dataCreate, email);
+  await updateMentorByIdAsync(mentorId, dataCreate, email);
 
   return {
+    intent,
     successMessage: "User successfully saved!",
     errorMessage: null,
   };
+}
+
+export async function action({ request, params }: Route.ActionArgs) {
+  invariant(params.mentorId, "mentorId not found");
+  const mentorId = Number(params.mentorId);
+
+  // Three independent mutation sources post to this route:
+  // - the profile details form (navigation submit)
+  // - the profile picture widget (fetcher)
+  // - the checklist deletes (fetcher)
+  // Each declares an explicit `intent` field for clarity.
+  // Only the profile picture upload is multipart; everything else is urlencoded.
+  const formData = request.headers
+    .get("content-type")
+    ?.includes("multipart/form-data")
+    ? await parseFormData(request, uploadHandler)
+    : await request.formData();
+
+  const intent = formData.get("intent")?.toString();
+
+  switch (intent) {
+    case "delete-check":
+      return await deleteCheck(mentorId, formData);
+
+    case "profile-picture":
+      return await updateProfilePicture(mentorId, formData);
+
+    case "profile-details":
+      return await updateProfileDetails(mentorId, formData);
+
+    default:
+      throw new Response(`Unknown form intent: "${intent ?? ""}"`, {
+        status: 400,
+      });
+  }
 }
 
 export default function Index({
   loaderData,
   actionData,
 }: Route.ComponentProps) {
+  // Fetcher-based mutations (checklist deletes, profile picture) read their
+  // results from their own fetcher.data; only the profile-details navigation
+  // submit surfaces through actionData. Guard by intent so a result from one
+  // source can never be displayed as feedback for another.
+  const profileDetailsResult =
+    actionData?.intent === "profile-details" ? actionData : undefined;
+
   return (
     <div className="flex h-full flex-col">
       <Header
@@ -228,7 +310,8 @@ export default function Index({
         <UserForm
           user={loaderData.user}
           chapters={loaderData.chapters}
-          successMessage={actionData?.successMessage}
+          successMessage={profileDetailsResult?.successMessage}
+          errorMessage={profileDetailsResult?.errorMessage}
         />
 
         <hr className="my-8 md:hidden" />

@@ -1,17 +1,18 @@
 import { useRef, useState } from "react";
 
-import { useSubmit } from "react-router";
+import { useFetcher } from "react-router";
 import { Xmark } from "iconoir-react";
 
 interface Props {
   defaultValue: string | null;
   fullName: string;
+  disabled: boolean | null;
 }
 
 const PROFILE_PHOTO_MAX_SIZE = 1000000; // would be nice to humanise in error message
 
-export function ProfileInput({ defaultValue, fullName }: Props) {
-  const submit = useSubmit();
+export function ProfileInput({ defaultValue, fullName, disabled }: Props) {
+  const fetcher = useFetcher();
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   const [profilePicturePath, setProfilePicturePath] = useState<string | null>(
@@ -22,6 +23,10 @@ export function ProfileInput({ defaultValue, fullName }: Props) {
   const hasImage = selectedImage ?? profilePicturePath;
 
   const removeProfilePic = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (disabled) {
+      return;
+    }
+
     e.preventDefault();
 
     if (!confirm("Are you sure?")) {
@@ -36,12 +41,20 @@ export function ProfileInput({ defaultValue, fullName }: Props) {
     setProfilePicturePath(null);
 
     const formData = new FormData();
+    formData.append("intent", "profile-picture");
     formData.append("profilePicture", "DELETE");
 
-    void submit(formData, { method: "POST", encType: "multipart/form-data" });
+    void fetcher.submit(formData, {
+      method: "POST",
+      encType: "multipart/form-data",
+    });
   };
 
   const addProfilePic = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (disabled) {
+      return;
+    }
+
     const file = e.target.files?.[0] ?? null;
 
     if (file === null) {
@@ -69,9 +82,13 @@ export function ProfileInput({ defaultValue, fullName }: Props) {
     setSelectedImage(file);
 
     const formData = new FormData();
+    formData.append("intent", "profile-picture");
     formData.append("profilePicture", file);
 
-    void submit(formData, { method: "POST", encType: "multipart/form-data" });
+    void fetcher.submit(formData, {
+      method: "POST",
+      encType: "multipart/form-data",
+    });
   };
 
   return (
@@ -94,6 +111,7 @@ export function ProfileInput({ defaultValue, fullName }: Props) {
           <button
             className="btn btn-error w-32 gap-2"
             onClick={removeProfilePic}
+            disabled={!!disabled}
           >
             <Xmark className="h-6 w-6" />
             Remove
@@ -102,17 +120,14 @@ export function ProfileInput({ defaultValue, fullName }: Props) {
 
         <input
           type="file"
-          name="profilePicture"
+          // Deliberately unnamed: this widget submits via its own fetcher with
+          // intent=profile-picture. An unnamed input never leaks the file into
+          // the surrounding profile-details form submit.
           className={hasImage ? "hidden" : "file-input w-full max-w-xs"}
           ref={inputRef}
           accept="image/png, image/gif, image/jpeg"
           onChange={addProfilePic}
-        />
-
-        <input
-          type="hidden"
-          name="deleteProfilePicture"
-          value={(!hasImage).toString()}
+          disabled={!!disabled}
         />
       </div>
     </div>
