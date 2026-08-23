@@ -352,4 +352,4 @@ ALTER TABLE `Volunteer` RENAME INDEX `Mentor_email_key` TO `Volunteer_email_key`
 ALTER TABLE `VolunteerResource` RENAME INDEX `MentorResource_label_url_key` TO `VolunteerResource_label_url_key`;
 
 -- RenameIndex
-ALTER TABLE `VolunteerResourcecategory` RENAME INDEX `MentorResourceCategory_label_key` TO `VolunteerResourceCategory_label_key`;
+ALTER TABLE `VolunteerResourceCategory` RENAME INDEX `MentorResourceCategory_label_key` TO `VolunteerResourceCategory_label_key`;
