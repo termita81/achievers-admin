@@ -1,7 +1,7 @@
 import { prisma } from "~/db.server";
 
 export async function getUserByIdAsync(id: number) {
-  return await prisma.mentor.findUniqueOrThrow({
+  return await prisma.volunteer.findUniqueOrThrow({
     where: {
       id,
     },
@@ -15,7 +15,7 @@ export async function getUserByIdAsync(id: number) {
 }
 
 export async function updateAzureIdAsync(mentorId: number, azureADId: string) {
-  await prisma.mentor.update({
+  await prisma.volunteer.update({
     where: {
       id: mentorId,
     },
@@ -26,7 +26,7 @@ export async function updateAzureIdAsync(mentorId: number, azureADId: string) {
 }
 
 export async function removeUserAccessAsync(mentorId: number) {
-  await prisma.mentor.update({
+  await prisma.volunteer.update({
     where: {
       id: mentorId,
     },

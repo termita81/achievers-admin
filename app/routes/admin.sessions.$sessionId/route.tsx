@@ -138,7 +138,7 @@ export default function Index({
         <div className="flex flex-col gap-2 border-b border-gray-300 p-2 sm:flex-row sm:items-center">
           <div className="w-72 font-bold">Mentor</div>
           <div className="sm:flex-1">
-            {session.mentorSession.mentor.fullName}
+            {session.volunteerSession.volunteer.fullName}
           </div>
 
           {!session.completedOn && !session.cancelledAt && (
@@ -152,7 +152,7 @@ export default function Index({
           )}
 
           <StateLink
-            to={`/admin/chapters/${chapter.id}/roster-mentors/mentor-sessions/${session.mentorSession.id}`}
+            to={`/admin/chapters/${chapter.id}/roster-mentors/mentor-sessions/${session.volunteerSession.id}`}
             className="btn w-full sm:w-48"
           >
             <UserPlus />

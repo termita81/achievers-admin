@@ -7,7 +7,7 @@ export async function mentorAsync(
     "$connect" | "$disconnect" | "$on" | "$transaction" | "$extends"
   >,
 ) {
-  const { id } = await tx.mentor.findUniqueOrThrow({
+  const { id } = await tx.volunteer.findUniqueOrThrow({
     where: {
       email: "test_0@test.com",
     },
@@ -16,7 +16,7 @@ export async function mentorAsync(
     },
   });
 
-  await tx.mentor.update({
+  await tx.volunteer.update({
     where: {
       id,
     },

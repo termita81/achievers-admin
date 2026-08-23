@@ -6,7 +6,7 @@ import {
 } from "~/services/.server";
 
 export async function isUniqueEmailAsync(email: string) {
-  const count = await prisma.mentor.count({
+  const count = await prisma.volunteer.count({
     where: {
       email,
     },
@@ -20,7 +20,7 @@ export async function udpdateInvitedMentorEmailAsync(
   id: number,
   email: string,
 ) {
-  const mentor = await prisma.mentor.findUniqueOrThrow({
+  const volunteer = await prisma.volunteer.findUniqueOrThrow({
     where: {
       id,
     },
@@ -29,13 +29,13 @@ export async function udpdateInvitedMentorEmailAsync(
     },
   });
 
-  if (mentor.azureADId === null) {
-    throw new Error("Mentor is not part of Azure AD.");
+  if (volunteer.azureADId === null) {
+    throw new Error("Volunteer is not part of Azure AD.");
   }
 
-  await deleteAzureUserAsync(request, mentor.azureADId);
+  await deleteAzureUserAsync(request, volunteer.azureADId);
 
-  await prisma.mentor.update({
+  await prisma.volunteer.update({
     where: {
       id,
     },
@@ -52,7 +52,7 @@ export async function udpdateInvitedMentorEmailAsync(
     azureUserId = await inviteMentorAsync(request, email);
   }
 
-  await prisma.mentor.update({
+  await prisma.volunteer.update({
     where: {
       id,
     },

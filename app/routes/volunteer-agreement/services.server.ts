@@ -22,7 +22,7 @@ interface MentorCommand {
 }
 
 export async function getUserByAzureADIdAsync(azureADId: string) {
-  return await prisma.mentor.findUniqueOrThrow({
+  return await prisma.volunteer.findUniqueOrThrow({
     where: {
       azureADId,
       endDate: null,
@@ -54,7 +54,7 @@ export async function confirmUserDetailsAsync(
   mentorId: number,
   data: MentorCommand,
 ) {
-  await prisma.mentor.update({
+  await prisma.volunteer.update({
     where: {
       id: mentorId,
     },

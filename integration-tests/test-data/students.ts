@@ -8,7 +8,7 @@ export async function createStudentsAsync(
   >,
 ) {
   await tx.importedStudentHistory.deleteMany();
-  await tx.mentorToStudentAssignement.deleteMany();
+  await tx.volunteerToStudentAssignement.deleteMany();
   await tx.studentGuardian.deleteMany();
   await tx.studentTeacher.deleteMany();
   await tx.studentAttendance.deleteMany();

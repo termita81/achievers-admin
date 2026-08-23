@@ -230,10 +230,10 @@ export default function Index({
                       completedOn,
                       signedOffOn,
                       isCancelled,
-                      mentorSession: { mentor },
+                      volunteerSession: { volunteer },
                     }) => (
                       <tr key={id}>
-                        <td className="p-2">{mentor.fullName}</td>
+                        <td className="p-2">{volunteer.fullName}</td>
                         {isCancelled ? (
                           <>
                             <td colSpan={2}>

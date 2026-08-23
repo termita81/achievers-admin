@@ -31,12 +31,12 @@ enum CancelledEntity {
   STUDENT
 }
 
-enum MentorStatus {
+enum VolunteerStatus {
   ARCHIVED
   BLOCKED
 }
 
-model Mentor {
+model Volunteer {
   id        Int     @id @default(autoincrement())
   azureADId String? @unique // Defined by Azure Active Directory.
 
@@ -72,10 +72,10 @@ model Mentor {
   volunteerAgreementSignedOn DateTime?
   skillOther                 String?
 
-  status    MentorStatus?
+  status    VolunteerStatus?
   endDate   DateTime?
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
 
   eoIProfile    EoIProfile?
   welcomeCall   WelcomeCall?
@@ -88,29 +88,29 @@ model Mentor {
   chapterId Int
   chapter   Chapter @relation(fields: [chapterId], references: [id])
 
-  mentorToStudentAssignement MentorToStudentAssignement[]
-  mentorSession              MentorSession[]
+  volunteerToStudentAssignement VolunteerToStudentAssignement[]
+  volunteerSession              VolunteerSession[]
 
   importedHistory ImportedHistory?
 
-  mentorAttendance MentorAttendance[]
-  goal             Goal[]
+  volunteerAttendance VolunteerAttendance[]
+  goal                Goal[]
 
-  mentorSharing  MentorShareInfo[] @relation("mentorSharing")
-  mentorSharedTo MentorShareInfo[] @relation("mentorSharedTo")
+  volunteerSharing  VolunteerShareInfo[] @relation("volunteerSharing")
+  volunteerSharedTo VolunteerShareInfo[] @relation("volunteerSharedTo")
 
-  mentorNotes  MentorNote[]
-  mentorSkills MentorSkill[]
+  volunteerNotes  VolunteerNote[]
+  volunteerSkills VolunteerSkill[]
 }
 
-model MentorSkill {
+model VolunteerSkill {
   id Int @id @default(autoincrement())
 
   skill   Skill @relation(fields: [skillId], references: [id])
   skillId Int
 
-  mentor   Mentor @relation(fields: [mentorId], references: [id])
-  mentorId Int
+  volunteer   Volunteer @relation(fields: [volunteerId], references: [id])
+  volunteerId Int
 }
 
 model Skill {
@@ -121,12 +121,12 @@ model Skill {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  mentorSkills MentorSkill[]
+  volunteerSkills VolunteerSkill[]
 
   @@unique([label])
 }
 
-model MentorNote {
+model VolunteerNote {
   id Int @id @default(autoincrement())
 
   note String @db.Text
@@ -134,16 +134,16 @@ model MentorNote {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  mentor   Mentor @relation(fields: [mentorId], references: [id])
-  mentorId Int
+  volunteer   Volunteer @relation(fields: [volunteerId], references: [id])
+  volunteerId Int
 }
 
 model ImportedHistory {
   id    Int     @id @default(autoincrement())
   error String? @db.Text
 
-  mentor   Mentor @relation(fields: [mentorId], references: [id])
-  mentorId Int    @unique
+  volunteer   Volunteer @relation(fields: [volunteerId], references: [id])
+  volunteerId Int       @unique
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -170,8 +170,8 @@ model EoIProfile {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  mentor   Mentor @relation(fields: [mentorId], references: [id])
-  mentorId Int    @unique
+  volunteer   Volunteer @relation(fields: [volunteerId], references: [id])
+  volunteerId Int       @unique
 }
 
 model WelcomeCall {
@@ -184,8 +184,8 @@ model WelcomeCall {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  mentor   Mentor @relation(fields: [mentorId], references: [id])
-  mentorId Int    @unique
+  volunteer   Volunteer @relation(fields: [volunteerId], references: [id])
+  volunteerId Int       @unique
 }
 
 model Reference {
@@ -217,8 +217,8 @@ model Reference {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  mentor   Mentor @relation(fields: [mentorId], references: [id])
-  mentorId Int
+  volunteer   Volunteer @relation(fields: [volunteerId], references: [id])
+  volunteerId Int
 }
 
 model Induction {
@@ -231,8 +231,8 @@ model Induction {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  mentor   Mentor @relation(fields: [mentorId], references: [id])
-  mentorId Int    @unique
+  volunteer   Volunteer @relation(fields: [volunteerId], references: [id])
+  volunteerId Int       @unique
 }
 
 model PoliceCheck {
@@ -246,8 +246,8 @@ model PoliceCheck {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  mentor   Mentor @relation(fields: [mentorId], references: [id])
-  mentorId Int    @unique
+  volunteer   Volunteer @relation(fields: [volunteerId], references: [id])
+  volunteerId Int       @unique
 }
 
 model WWCCheck {
@@ -261,8 +261,8 @@ model WWCCheck {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  mentor   Mentor @relation(fields: [mentorId], references: [id])
-  mentorId Int    @unique
+  volunteer   Volunteer @relation(fields: [volunteerId], references: [id])
+  volunteerId Int       @unique
 }
 
 model ApprovalbyMRC {
@@ -275,8 +275,8 @@ model ApprovalbyMRC {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  mentor   Mentor @relation(fields: [mentorId], references: [id])
-  mentorId Int    @unique
+  volunteer   Volunteer @relation(fields: [volunteerId], references: [id])
+  volunteerId Int       @unique
 }
 
 model Chapter {
@@ -287,16 +287,16 @@ model Chapter {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  mentor  Mentor[]
-  student Student[]
-  session Session[]
-  goal    Goal[]
+  volunteer Volunteer[]
+  student   Student[]
+  session   Session[]
+  goal      Goal[]
 
-  mentorAttendance  MentorAttendance[]
-  studentAttendance StudentAttendance[]
-  eoiStudentProfile EoiStudentProfile[]
-  mentorSession     MentorSession[]
-  studentSession    StudentSession[]
+  volunteerAttendance VolunteerAttendance[]
+  studentAttendance   StudentAttendance[]
+  eoiStudentProfile   EoiStudentProfile[]
+  volunteerSession    VolunteerSession[]
+  studentSession      StudentSession[]
 }
 
 model Student {
@@ -337,9 +337,9 @@ model Student {
   chapterId Int
   chapter   Chapter @relation(fields: [chapterId], references: [id])
 
-  mentorToStudentAssignement MentorToStudentAssignement[]
-  studentSession             StudentSession[]
-  studentAttendance          StudentAttendance[]
+  volunteerToStudentAssignement VolunteerToStudentAssignement[]
+  studentSession                StudentSession[]
+  studentAttendance             StudentAttendance[]
 
   studentSchoolReport StudentSchoolReport[]
   goal                Goal[]
@@ -414,13 +414,13 @@ model ImportedStudentHistory {
   updatedAt DateTime @updatedAt
 }
 
-model MentorToStudentAssignement {
+model VolunteerToStudentAssignement {
   id Int @id @default(autoincrement())
 
-  mentor    Mentor  @relation(fields: [mentorId], references: [id])
-  mentorId  Int
-  student   Student @relation(fields: [studentId], references: [id])
-  studentId Int
+  volunteer   Volunteer @relation(fields: [volunteerId], references: [id])
+  volunteerId Int
+  student     Student   @relation(fields: [studentId], references: [id])
+  studentId   Int
 
   assignedBy String
   assignedAt DateTime @default(now())
@@ -428,7 +428,7 @@ model MentorToStudentAssignement {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([mentorId, studentId])
+  @@unique([volunteerId, studentId])
 }
 
 model SchoolTerm {
@@ -447,18 +447,18 @@ model SchoolTerm {
   @@index([year])
 }
 
-model MentorAttendance {
-  id         Int      @id @default(autoincrement())
-  chapter    Chapter  @relation(fields: [chapterId], references: [id])
-  chapterId  Int
-  mentor     Mentor   @relation(fields: [mentorId], references: [id])
-  mentorId   Int
-  attendedOn DateTime
+model VolunteerAttendance {
+  id          Int       @id @default(autoincrement())
+  chapter     Chapter   @relation(fields: [chapterId], references: [id])
+  chapterId   Int
+  volunteer   Volunteer @relation(fields: [volunteerId], references: [id])
+  volunteerId Int
+  attendedOn  DateTime
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([chapterId, mentorId, attendedOn])
+  @@unique([chapterId, volunteerId, attendedOn])
 }
 
 model StudentAttendance {
@@ -478,8 +478,8 @@ model StudentAttendance {
 model Session {
   id Int @id @default(autoincrement())
 
-  mentorSession   MentorSession @relation(fields: [mentorSessionId], references: [id])
-  mentorSessionId Int
+  volunteerSession   VolunteerSession @relation(fields: [volunteerSessionId], references: [id])
+  volunteerSessionId Int
 
   studentSession   StudentSession @relation(fields: [studentSessionId], references: [id])
   studentSessionId Int
@@ -509,7 +509,7 @@ model Session {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([chapterId, mentorSessionId, studentSessionId])
+  @@unique([chapterId, volunteerSessionId, studentSessionId])
 }
 
 model SessionCancelledReason {
@@ -519,14 +519,14 @@ model SessionCancelledReason {
   session Session[]
 }
 
-model MentorSession {
+model VolunteerSession {
   id Int @id @default(autoincrement())
 
   chapter   Chapter @relation(fields: [chapterId], references: [id])
   chapterId Int
 
-  mentor   Mentor @relation(fields: [mentorId], references: [id])
-  mentorId Int
+  volunteer   Volunteer @relation(fields: [volunteerId], references: [id])
+  volunteerId Int
 
   attendedOn DateTime      @db.Date
   status     SessionStatus @default(AVAILABLE)
@@ -536,7 +536,7 @@ model MentorSession {
 
   session Session[]
 
-  @@unique([chapterId, mentorId, attendedOn])
+  @@unique([chapterId, volunteerId, attendedOn])
 }
 
 model StudentSession {
@@ -579,12 +579,12 @@ model StudentSchoolReport {
 model Goal {
   id Int @id @default(autoincrement())
 
-  chapter   Chapter @relation(fields: [chapterId], references: [id])
-  chapterId Int
-  student   Student @relation(fields: [studentId], references: [id])
-  studentId Int
-  mentor    Mentor  @relation(fields: [mentorId], references: [id])
-  mentorId  Int
+  chapter     Chapter   @relation(fields: [chapterId], references: [id])
+  chapterId   Int
+  student     Student   @relation(fields: [studentId], references: [id])
+  studentId   Int
+  volunteer   Volunteer @relation(fields: [volunteerId], references: [id])
+  volunteerId Int
 
   title      String
   goal       String   @db.Text
@@ -595,22 +595,22 @@ model Goal {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([studentId, mentorId])
+  @@index([studentId, volunteerId])
 }
 
-model MentorShareInfo {
+model VolunteerShareInfo {
   id Int @id @default(autoincrement())
 
-  mentorSharing   Mentor @relation(name: "mentorSharing", fields: [mentorSharingId], references: [id])
-  mentorSharingId Int
+  volunteerSharing   Volunteer @relation(name: "volunteerSharing", fields: [volunteerSharingId], references: [id])
+  volunteerSharingId Int
 
-  mentorSharedTo   Mentor @relation(name: "mentorSharedTo", fields: [mentorSharedToId], references: [id])
-  mentorSharedToId Int
+  volunteerSharedTo   Volunteer @relation(name: "volunteerSharedTo", fields: [volunteerSharedToId], references: [id])
+  volunteerSharedToId Int
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([mentorSharingId, mentorSharedToId])
+  @@unique([volunteerSharingId, volunteerSharedToId])
 }
 
 model EoiStudentProfile {
@@ -669,14 +669,14 @@ model StudentGrade {
   @@unique([year, semester, subject, studentId])
 }
 
-model MentorResourceCategory {
+model VolunteerResourceCategory {
   id Int @id @default(autoincrement())
 
   order       Int
   label       String
   description String?
 
-  mentorResource MentorResource[]
+  volunteerResource VolunteerResource[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -684,7 +684,7 @@ model MentorResourceCategory {
   @@unique([label])
 }
 
-model MentorResource {
+model VolunteerResource {
   id Int @id @default(autoincrement())
 
   order       Int
@@ -692,8 +692,8 @@ model MentorResource {
   description String? @db.Text
   url         String
 
-  mentorResourcesCategory  MentorResourceCategory @relation(fields: [mentorResourceCategoryId], references: [id])
-  mentorResourceCategoryId Int
+  volunteerResourcesCategory  VolunteerResourceCategory @relation(fields: [volunteerResourceCategoryId], references: [id])
+  volunteerResourceCategoryId Int
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

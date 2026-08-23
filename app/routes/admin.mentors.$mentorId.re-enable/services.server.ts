@@ -1,7 +1,7 @@
 import { prisma } from "~/db.server";
 
 export async function getUserByIdAsync(id: number) {
-  return await prisma.mentor.findUniqueOrThrow({
+  return await prisma.volunteer.findUniqueOrThrow({
     where: {
       id,
     },
@@ -12,10 +12,10 @@ export async function getUserByIdAsync(id: number) {
   });
 }
 
-export async function updateEndDateAsync(mentorId: number) {
-  await prisma.mentor.update({
+export async function updateEndDateAsync(volunteerId: number) {
+  await prisma.volunteer.update({
     where: {
-      id: mentorId,
+      id: volunteerId,
     },
     data: {
       endDate: null,

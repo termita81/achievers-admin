@@ -102,7 +102,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   );
 
   const isNotMyReport =
-    session !== null && session.mentorSession.mentorId !== user.id;
+    session !== null && session.volunteerSession.volunteerId !== user.id;
 
   const currentTerm = getCurrentTermForDate(terms, new Date());
   const distinctTermYears = getDistinctTermYears(terms);
@@ -327,7 +327,7 @@ export default function Index({
             <WarningTriangle className="h-6 w-6" />
             Written By{" "}
             <span className="font-bold">
-              {session.mentorSession.mentor.fullName}
+              {session.volunteerSession.volunteer.fullName}
             </span>
           </p>
         )}

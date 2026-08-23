@@ -129,7 +129,7 @@ export function getUserQuery(
           pc.reminderSentAt policeCheckReminderSentAt,
           wcc.expiryDate wwccheckExpiryDate,
           wcc.reminderSentAt wwccheckReminderSent,
-          (SELECT COUNT(r.mentorId) FROM Reference r WHERE r.mentorId = u.id GROUP BY r.mentorId) as count,
+          (SELECT COUNT(r.volunteerId) FROM Reference r WHERE r.volunteerId = u.id GROUP BY r.volunteerId) as count,
           ap.id approvalbymrcId,
           p.id eoiprofileId,
           pc.id policecheckId,
@@ -137,14 +137,14 @@ export function getUserQuery(
           wc.id welcomecallId,
           i.id inductionId,
           c.id chapterId
-        FROM Mentor u
+        FROM Volunteer u
         INNER JOIN Chapter c ON c.id = u.chapterId
-        LEFT JOIN ApprovalbyMRC ap ON ap.mentorId = u.id
-        LEFT JOIN EoIProfile p ON p.mentorId = u.id
-        LEFT JOIN PoliceCheck pc ON pc.mentorId = u.id
-        LEFT JOIN WWCCheck wcc ON wcc.mentorId = u.id
-        LEFT JOIN WelcomeCall wc ON wc.mentorId = u.id
-        LEFT JOIN Induction i ON i.mentorId = u.id
+        LEFT JOIN ApprovalbyMRC ap ON ap.volunteerId = u.id
+        LEFT JOIN EoIProfile p ON p.volunteerId = u.id
+        LEFT JOIN PoliceCheck pc ON pc.volunteerId = u.id
+        LEFT JOIN WWCCheck wcc ON wcc.volunteerId = u.id
+        LEFT JOIN WelcomeCall wc ON wc.volunteerId = u.id
+        LEFT JOIN Induction i ON i.volunteerId = u.id
     ) as s
     WHERE
       ${chapterWhereClause}

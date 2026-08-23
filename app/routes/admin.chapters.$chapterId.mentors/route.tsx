@@ -16,7 +16,7 @@ import {
 
 import {
   getMentorsWithStudentsAsync,
-  getStudentsCountAsync,
+  getMentorsCountAsync,
 } from "./services.server";
 
 export async function loader({ request, params }: Route.LoaderArgs) {
@@ -40,7 +40,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   const searchTerm = url.safeSearchParams.getNullOrEmpty("searchTerm");
   const pageNumber = Number(url.safeSearchParams.getNullOrEmpty("pageNumber")!);
 
-  const count = await getStudentsCountAsync(
+  const count = await getMentorsCountAsync(
     Number(params.chapterId),
     searchTerm,
   );
@@ -158,7 +158,7 @@ export default function Index({
                   id,
                   fullName,
                   frequencyInDays,
-                  mentorToStudentAssignement,
+                  volunteerToStudentAssignement,
                 }) => (
                   <tr key={id}>
                     <td className="p-2">
@@ -173,7 +173,7 @@ export default function Index({
                     </td>
                     <td>
                       <ul className="list-disc pl-2">
-                        {mentorToStudentAssignement.map(({ student }) => (
+                        {volunteerToStudentAssignement.map(({ student }) => (
                           <li key={student.id}>{student.fullName}</li>
                         ))}
                       </ul>

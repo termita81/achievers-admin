@@ -79,7 +79,7 @@ export default function Index({
                 </tr>
               )}
               {history.map(
-                ({ mentor: { id, fullName }, error, createdAt }, index) => (
+                ({ volunteer: { id, fullName }, error, createdAt }, index) => (
                   <tr
                     key={id}
                     className={error !== null ? "bg-error" : undefined}

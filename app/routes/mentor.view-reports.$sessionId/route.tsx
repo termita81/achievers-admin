@@ -123,7 +123,7 @@ export default function Index({
         <SubTitle>Report</SubTitle>
         <div className="mb-1 flex gap-2">
           <h3 className="font-bold">Written by mentor:</h3>
-          <p>{session.mentorSession.mentor.fullName}</p>
+          <p>{session.volunteerSession.volunteer.fullName}</p>
         </div>
         <Editor isReadonly initialEditorStateType={session.report} />
 

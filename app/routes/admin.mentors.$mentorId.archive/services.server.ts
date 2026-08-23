@@ -1,7 +1,7 @@
 import { prisma } from "~/db.server";
 
 export async function getUserByIdAsync(id: number) {
-  return await prisma.mentor.findUniqueOrThrow({
+  return await prisma.volunteer.findUniqueOrThrow({
     where: {
       id,
     },
@@ -14,24 +14,24 @@ export async function getUserByIdAsync(id: number) {
   });
 }
 
-export async function archiveUserAsync(mentorId: number, endReason: string) {
+export async function archiveUserAsync(volunteerId: number, endReason: string) {
   return await prisma.$transaction(async (tx) => {
-    await tx.mentorToStudentAssignement.deleteMany({
+    await tx.volunteerToStudentAssignement.deleteMany({
       where: {
-        mentorId,
+        volunteerId,
       },
     });
 
-    await tx.mentorNote.create({
+    await tx.volunteerNote.create({
       data: {
         note: endReason,
-        mentorId,
+        volunteerId,
       },
     });
 
-    return await tx.mentor.update({
+    return await tx.volunteer.update({
       where: {
-        id: mentorId,
+        id: volunteerId,
       },
       data: {
         azureADId: null,

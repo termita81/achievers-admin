@@ -5,7 +5,7 @@ import {
 } from "~/services/.server";
 
 export async function getUserByIdAsync(id: number) {
-  return await prisma.mentor.findUniqueOrThrow({
+  return await prisma.volunteer.findUniqueOrThrow({
     where: {
       id,
     },
@@ -39,7 +39,7 @@ export async function inviteMentorAndUpdateAsync(
 }
 
 async function updateAzureIdAsync(mentorId: number, azureADId: string) {
-  await prisma.mentor.update({
+  await prisma.volunteer.update({
     where: {
       id: mentorId,
     },

@@ -10,11 +10,11 @@ import { addCollectionToSpreadsheet } from "~/services/.server";
 
 dayjs.extend(utc);
 
-interface MentorSession {
-  mentorSessionId: number;
+interface VolunteerSession {
+  volunteerSessionId: number;
   status: SessionStatus;
   attendedOn: string;
-  mentorId: number;
+  volunteerId: number;
   sessionId: number | null;
   hasReport: number | null;
   completedOn: string | null;
@@ -27,15 +27,15 @@ interface MentorSession {
 type SessionLookup = Record<
   string,
   {
-    mentorSessionId: number;
+    volunteerSessionId: number;
     status: SessionStatus;
     attendedOn: string;
-    mentorId: number;
+    volunteerId: number;
     sessions: {
-      mentorSessionId: number;
+      volunteerSessionId: number;
       status: SessionStatus;
       attendedOn: string;
-      mentorId: number;
+      volunteerId: number;
       sessionId: number;
       hasReport: boolean;
       completedOn: string | null;
@@ -65,21 +65,21 @@ export async function exportRosterToSpreadsheetAsync(
 
     sessionDates.forEach((attendedOn) => {
       const attendedOnFormatted = dayjs(attendedOn).format("YYYY-MM-DD");
-      const mentorSession = sessionLookup?.[attendedOnFormatted];
+      const volunteerSession = sessionLookup?.[attendedOnFormatted];
 
       let label = "";
-      if (mentorSession) {
-        if (mentorSession.sessions.length === 0) {
-          if (mentorSession.status === "UNAVAILABLE") {
+      if (volunteerSession) {
+        if (volunteerSession.sessions.length === 0) {
+          if (volunteerSession.status === "UNAVAILABLE") {
             label = "Unavailable";
           } else {
             label = "Available";
           }
-        } else if (mentorSession.sessions.length === 1) {
-          const session = mentorSession.sessions[0];
+        } else if (volunteerSession.sessions.length === 1) {
+          const session = volunteerSession.sessions[0];
           label = `${session.studentFullName} (Year ${session.yearLevel ?? "-"})${session.isCancelled ? " (Cancelled)" : ""}`;
         } else {
-          label = `${mentorSession.sessions.length} Students`;
+          label = `${volunteerSession.sessions.length} Students`;
         }
       }
 
@@ -96,7 +96,7 @@ export async function getMentorsAsync(
   chapterId: number,
   term: Term,
 ): Promise<SessionViewModel[]> {
-  const mentors = await prisma.mentor.findMany({
+  const mentors = await prisma.volunteer.findMany({
     where: {
       endDate: null,
       chapterId,
@@ -110,12 +110,12 @@ export async function getMentorsAsync(
     },
   });
 
-  const mentorSessions = await prisma.$queryRaw<MentorSession[]>`
+  const volunteerSessions = await prisma.$queryRaw<VolunteerSession[]>`
       SELECT
-        ms.id AS mentorSessionId,
+        ms.id AS volunteerSessionId,
         ms.status,
         ms.attendedOn,
-        ms.mentorId,
+        ms.volunteerId,
         sa.id AS sessionId,
         sa.hasReport,
         sa.completedOn,
@@ -123,53 +123,55 @@ export async function getMentorsAsync(
         ss.studentId,
         s.fullName AS studentFullName,
         s.yearLevel
-      FROM MentorSession ms
-      LEFT JOIN Session sa ON sa.mentorSessionId = ms.id
+      FROM VolunteerSession ms
+      LEFT JOIN Session sa ON sa.volunteerSessionId = ms.id
       LEFT JOIN StudentSession ss ON ss.id = sa.studentSessionId
       LEFT JOIN Student s ON s.id = ss.studentId
       WHERE ms.chapterId = ${chapterId}
         AND ms.attendedOn BETWEEN ${term.start.utc().format("YYYY-MM-DD")} AND ${term.end.utc().format("YYYY-MM-DD")}`;
 
-  const mentorSessionLookup = mentorSessions.reduce<
+  const volunteerSessionLookup = volunteerSessions.reduce<
     Record<string, SessionLookup>
-  >((res, mentorSession) => {
-    const attendedOn = dayjs.utc(mentorSession.attendedOn).format("YYYY-MM-DD");
+  >((res, volunteerSession) => {
+    const attendedOn = dayjs
+      .utc(volunteerSession.attendedOn)
+      .format("YYYY-MM-DD");
 
     const session = {
-      mentorSessionId: mentorSession.mentorSessionId,
-      attendedOn: mentorSession.attendedOn,
-      status: mentorSession.status,
-      mentorId: mentorSession.mentorId,
-      studentId: mentorSession.studentId!,
-      sessionId: mentorSession.sessionId!,
-      hasReport: mentorSession.hasReport === 1,
-      completedOn: mentorSession.completedOn,
-      isCancelled: mentorSession.isCancelled === 1,
-      studentFullName: mentorSession.studentFullName!,
-      yearLevel: mentorSession.yearLevel,
+      volunteerSessionId: volunteerSession.volunteerSessionId,
+      attendedOn: volunteerSession.attendedOn,
+      status: volunteerSession.status,
+      volunteerId: volunteerSession.volunteerId,
+      studentId: volunteerSession.studentId!,
+      sessionId: volunteerSession.sessionId!,
+      hasReport: volunteerSession.hasReport === 1,
+      completedOn: volunteerSession.completedOn,
+      isCancelled: volunteerSession.isCancelled === 1,
+      studentFullName: volunteerSession.studentFullName!,
+      yearLevel: volunteerSession.yearLevel,
     };
 
-    if (res[mentorSession.mentorId]) {
-      if (res[mentorSession.mentorId][attendedOn]) {
+    if (res[volunteerSession.volunteerId]) {
+      if (res[volunteerSession.volunteerId][attendedOn]) {
         if (session.sessionId !== null) {
-          res[mentorSession.mentorId][attendedOn].sessions.push(session);
+          res[volunteerSession.volunteerId][attendedOn].sessions.push(session);
         }
       } else {
-        res[mentorSession.mentorId][attendedOn] = {
-          mentorSessionId: mentorSession.mentorSessionId,
-          attendedOn: mentorSession.attendedOn,
-          status: mentorSession.status,
-          mentorId: mentorSession.mentorId,
+        res[volunteerSession.volunteerId][attendedOn] = {
+          volunteerSessionId: volunteerSession.volunteerSessionId,
+          attendedOn: volunteerSession.attendedOn,
+          status: volunteerSession.status,
+          volunteerId: volunteerSession.volunteerId,
           sessions: session.sessionId !== null ? [session] : [],
         };
       }
     } else {
-      res[mentorSession.mentorId] = {
+      res[volunteerSession.volunteerId] = {
         [attendedOn]: {
-          mentorSessionId: mentorSession.mentorSessionId,
-          attendedOn: mentorSession.attendedOn,
-          status: mentorSession.status,
-          mentorId: mentorSession.mentorId,
+          volunteerSessionId: volunteerSession.volunteerSessionId,
+          attendedOn: volunteerSession.attendedOn,
+          status: volunteerSession.status,
+          volunteerId: volunteerSession.volunteerId,
           sessions: session.sessionId !== null ? [session] : [],
         },
       };
@@ -179,7 +181,7 @@ export async function getMentorsAsync(
   }, {});
 
   return mentors.map((mentor) => {
-    const session = mentorSessionLookup[mentor.id.toString()];
+    const session = volunteerSessionLookup[mentor.id.toString()];
     if (session === undefined) {
       return mentor;
     }

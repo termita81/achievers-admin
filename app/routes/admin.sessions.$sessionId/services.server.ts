@@ -44,10 +44,10 @@ export async function getSessionByIdAsync(sessionId: number) {
           },
         },
       },
-      mentorSession: {
+      volunteerSession: {
         select: {
           id: true,
-          mentor: {
+          volunteer: {
             select: {
               id: true,
               fullName: true,

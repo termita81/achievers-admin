@@ -79,17 +79,17 @@ export async function getMentorsForStudentAsync(
 ) {
   const allMentors = await prisma.$queryRaw<{ id: number; fullName: string }[]>`
     SELECT id, fullName
-    FROM Mentor
+    FROM Volunteer
     WHERE chapterId = ${chapterId} AND endDate IS NULL
-      AND id NOT IN (SELECT mentorId FROM MentorToStudentAssignement WHERE studentId = ${studentId})
+      AND id NOT IN (SELECT volunteerId FROM VolunteerToStudentAssignement WHERE studentId = ${studentId})
     ORDER BY fullName ASC`;
 
-  const assignedMentors = await prisma.mentorToStudentAssignement.findMany({
+  const assignedMentors = await prisma.volunteerToStudentAssignement.findMany({
     where: {
       studentId,
     },
     select: {
-      mentor: {
+      volunteer: {
         select: {
           id: true,
           fullName: true,
@@ -97,33 +97,33 @@ export async function getMentorsForStudentAsync(
       },
     },
     orderBy: {
-      mentor: {
+      volunteer: {
         fullName: "asc",
       },
     },
   });
 
-  const unavailableMentors = await prisma.mentorSession.findMany({
+  const unavailableMentors = await prisma.volunteerSession.findMany({
     where: {
       chapterId,
       attendedOn: dayjs.utc(attendedOn, "YYYY-MM-DD").toDate(),
       status: "UNAVAILABLE",
     },
     select: {
-      mentorId: true,
+      volunteerId: true,
     },
   });
 
   const unavailableMentorsLookup = unavailableMentors.reduce<
     Record<string, boolean>
-  >((res, { mentorId }) => {
-    res[mentorId.toString()] = true;
+  >((res, { volunteerId }) => {
+    res[volunteerId.toString()] = true;
 
     return res;
   }, {});
 
   return assignedMentors
-    .map(({ mentor: { id, fullName } }) => ({
+    .map(({ volunteer: { id, fullName } }) => ({
       id,
       fullName: `** ${fullName} (Assigned) **`,
     }))
@@ -162,11 +162,11 @@ export async function createSessionAsync({
     });
   }
 
-  const mentorSession = await prisma.mentorSession.findUnique({
+  const volunteerSession = await prisma.volunteerSession.findUnique({
     where: {
-      chapterId_mentorId_attendedOn: {
+      chapterId_volunteerId_attendedOn: {
         chapterId,
-        mentorId,
+        volunteerId: mentorId,
         attendedOn: dayjs.utc(attendedOn, "YYYY-MM-DD").toDate(),
       },
     },
@@ -176,8 +176,8 @@ export async function createSessionAsync({
     },
   });
 
-  if (mentorSession !== null) {
-    if (mentorSession.status !== "AVAILABLE") {
+  if (volunteerSession !== null) {
+    if (volunteerSession.status !== "AVAILABLE") {
       throw new Error(`Mentor with id: ${mentorId} is not available.`);
     }
 
@@ -191,7 +191,7 @@ export async function createSessionAsync({
           create: {
             chapterId,
             attendedOn: attendedOnConverted,
-            mentorSessionId: mentorSession.id,
+            volunteerSessionId: volunteerSession.id,
           },
         },
       },
@@ -202,10 +202,10 @@ export async function createSessionAsync({
   }
 
   return await prisma.$transaction(async (tx) => {
-    const mentorSession = await tx.mentorSession.create({
+    const volunteerSession = await tx.volunteerSession.create({
       data: {
         chapterId,
-        mentorId,
+        volunteerId: mentorId,
         attendedOn: attendedOnConverted,
       },
     });
@@ -220,7 +220,7 @@ export async function createSessionAsync({
           create: {
             chapterId,
             attendedOn: attendedOnConverted,
-            mentorSessionId: mentorSession.id,
+            volunteerSessionId: volunteerSession.id,
           },
         },
       },

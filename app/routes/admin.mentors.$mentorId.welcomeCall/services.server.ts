@@ -7,7 +7,7 @@ export interface UpdateWelcomeCallCommand {
 }
 
 export async function getUserByIdAsync(id: number) {
-  return await prisma.mentor.findUniqueOrThrow({
+  return await prisma.volunteer.findUniqueOrThrow({
     where: {
       id,
     },
@@ -25,13 +25,13 @@ export async function updateWelcomeCallAsync(
 ) {
   return await prisma.welcomeCall.upsert({
     where: {
-      mentorId,
+      volunteerId: mentorId,
     },
     create: {
       calledBy: data.calledBy,
       calledOnDate: data.calledOnDate,
       comment: data.comment,
-      mentorId,
+      volunteerId: mentorId,
     },
     update: {
       calledBy: data.calledBy,

@@ -20,11 +20,11 @@ export async function getMentorSessionForDateAsync(
   mentorId: number,
   attendedOn: string,
 ) {
-  return await prisma.mentorSession.findUnique({
+  return await prisma.volunteerSession.findUnique({
     where: {
-      chapterId_mentorId_attendedOn: {
+      chapterId_volunteerId_attendedOn: {
         chapterId,
-        mentorId,
+        volunteerId: mentorId,
         attendedOn: dayjs.utc(attendedOn, "YYYY-MM-DD").toDate(),
       },
     },
@@ -47,7 +47,7 @@ export async function getChapterByIdAsync(id: number) {
 }
 
 export async function getMentorByIdAsync(mentorId: number) {
-  return await prisma.mentor.findFirstOrThrow({
+  return await prisma.volunteer.findFirstOrThrow({
     where: {
       id: mentorId,
     },
@@ -69,12 +69,12 @@ export async function getStudentsForMentorAsync(
     SELECT id, fullName
     FROM Student
     WHERE chapterId = ${chapterId} AND endDate IS NULL
-      AND id NOT IN (SELECT studentId FROM MentorToStudentAssignement WHERE mentorId = ${mentorId})
+      AND id NOT IN (SELECT studentId FROM VolunteerToStudentAssignement WHERE volunteerId = ${mentorId})
     ORDER BY fullName ASC`;
 
-  const assignedStudents = await prisma.mentorToStudentAssignement.findMany({
+  const assignedStudents = await prisma.volunteerToStudentAssignement.findMany({
     where: {
-      mentorId,
+      volunteerId: mentorId,
     },
     select: {
       student: {
@@ -137,10 +137,10 @@ export async function createSessionAsync({
   const attendedOnConverted = dayjs.utc(attendedOn, "YYYY-MM-DD").toDate();
 
   if (studentId === null) {
-    return await prisma.mentorSession.create({
+    return await prisma.volunteerSession.create({
       data: {
         chapterId,
-        mentorId,
+        volunteerId: mentorId,
         attendedOn: attendedOnConverted,
         status: status as $Enums.SessionStatus,
       },
@@ -169,10 +169,10 @@ export async function createSessionAsync({
       throw new Error(`Student with id: ${studentId} is not available.`);
     }
 
-    return await prisma.mentorSession.create({
+    return await prisma.volunteerSession.create({
       data: {
         chapterId,
-        mentorId,
+        volunteerId: mentorId,
         attendedOn: attendedOnConverted,
         status: status as $Enums.SessionStatus,
         session: {
@@ -198,10 +198,10 @@ export async function createSessionAsync({
       },
     });
 
-    return await tx.mentorSession.create({
+    return await tx.volunteerSession.create({
       data: {
         chapterId,
-        mentorId,
+        volunteerId: mentorId,
         attendedOn: attendedOnConverted,
         status: status as $Enums.SessionStatus,
         session: {

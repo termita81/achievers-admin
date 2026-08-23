@@ -15,7 +15,7 @@ export interface PoliceCheckUpdateCommand {
 }
 
 export async function getUserByIdAsync(id: number) {
-  return await prisma.mentor.findUniqueOrThrow({
+  return await prisma.volunteer.findUniqueOrThrow({
     where: {
       id,
     },
@@ -28,20 +28,20 @@ export async function getUserByIdAsync(id: number) {
 }
 
 export async function updatePoliceCheckAsync(
-  mentorId: number,
+  volunteerId: number,
   data: PoliceCheckUpdateCommand,
 ) {
   const expiryDate = dayjs(data.expiryDate).toDate();
 
   return await prisma.policeCheck.upsert({
     where: {
-      mentorId,
+      volunteerId,
     },
     create: {
       expiryDate,
       filePath: data.filePath,
       applicationNumber: data.applicationNumber,
-      mentorId,
+      volunteerId,
     },
     update: {
       expiryDate,

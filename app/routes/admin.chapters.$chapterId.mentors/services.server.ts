@@ -2,11 +2,11 @@ import type { Prisma } from "~/prisma/client";
 
 import { prisma } from "~/db.server";
 
-export async function getStudentsCountAsync(
+export async function getMentorsCountAsync(
   chapterId: number,
   searchTerm: string | null,
 ) {
-  return prisma.mentor.count({
+  return prisma.volunteer.count({
     where: {
       endDate: null,
       chapterId,
@@ -23,7 +23,7 @@ export async function getMentorsWithStudentsAsync(
   sortCountStudents: Prisma.SortOrder | undefined,
   numberItems = 10,
 ) {
-  return prisma.mentor.findMany({
+  return prisma.volunteer.findMany({
     where: {
       endDate: null,
       chapterId,
@@ -33,7 +33,7 @@ export async function getMentorsWithStudentsAsync(
       id: true,
       fullName: true,
       frequencyInDays: true,
-      mentorToStudentAssignement: {
+      volunteerToStudentAssignement: {
         select: {
           student: {
             select: {
@@ -46,7 +46,7 @@ export async function getMentorsWithStudentsAsync(
     },
     orderBy: {
       fullName: sortCountStudents ? undefined : (sortFullName ?? "asc"),
-      mentorToStudentAssignement: sortCountStudents
+      volunteerToStudentAssignement: sortCountStudents
         ? {
             _count: sortCountStudents,
           }

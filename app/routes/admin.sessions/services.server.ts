@@ -38,9 +38,9 @@ export async function getAvailabelMentorsAsync(
       SELECT 
         m.id, m.fullName
       FROM Session sa
-      INNER JOIN MentorSession ms ON ms.id = sa.mentorSessionId
+      INNER JOIN VolunteerSession ms ON ms.id = sa.mentorSessionId
       INNER JOIN StudentSession ss ON ss.id = sa.studentSessionId
-      INNER JOIN Mentor m ON m.id = ms.mentorId
+      INNER JOIN Volunteer m ON m.id = ms.volunteerId
       WHERE ss.studentId = ${studentId} AND ${chapterId ? Prisma.sql`sa.chapterId = ${chapterId}` : "1=1"}
       GROUP BY m.id, m.fullName
       ORDER BY m.fullName ASC`;
@@ -49,7 +49,7 @@ export async function getAvailabelMentorsAsync(
   const dbOptions = await prisma.$queryRaw<DBOption[]>`
     SELECT DISTINCT
       m.id, m.fullName
-    FROM Mentor m
+    FROM Volunteer m
     WHERE ${sessions.length > 0 ? Prisma.sql`m.id NOT IN (${Prisma.join(sessions.map((s) => s.id))})` : "1=1"}
       AND ${chapterIdFilter ? Prisma.sql`m.chapterId = ${chapterIdFilter}` : "1=1"}
     ORDER BY m.fullName ASC`;
@@ -72,10 +72,10 @@ export async function getAvailabelStudentsAsync(
       SELECT 
         s.id, s.fullName
       FROM Session sa
-      INNER JOIN MentorSession ms ON ms.id = sa.mentorSessionId
+      INNER JOIN VolunteerSession ms ON ms.id = sa.volunteerSessionId
       INNER JOIN StudentSession ss ON ss.id = sa.studentSessionId
       INNER JOIN Student s ON s.id = ss.studentId
-      WHERE ms.mentorId = ${mentorId} AND ${chapterId ? Prisma.sql`sa.chapterId = ${chapterId}` : "1=1"}
+      WHERE ms.volunteerId = ${mentorId} AND ${chapterId ? Prisma.sql`sa.chapterId = ${chapterId}` : "1=1"}
       GROUP BY s.id, s.fullName
       ORDER BY s.fullName ASC`;
   }
@@ -146,9 +146,9 @@ export async function getSessionsAsync(
           },
         },
       },
-      mentorSession: {
+      volunteerSession: {
         select: {
-          mentor: {
+          volunteer: {
             select: {
               id: true,
               fullName: true,
@@ -174,7 +174,7 @@ function whereClause(
   term: Term,
   chapterId: number | undefined,
   termDate: string | undefined,
-  mentorId: number | undefined,
+  volunteerId: number | undefined,
   studentId: number | undefined,
   filterReports: string,
 ) {
@@ -183,8 +183,8 @@ function whereClause(
     studentSession: {
       studentId,
     },
-    mentorSession: {
-      mentorId,
+    volunteerSession: {
+      volunteerId,
     },
     completedOn:
       filterReports === "TO_SIGN_OFF"

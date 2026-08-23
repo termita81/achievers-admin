@@ -2,7 +2,7 @@ import { prisma } from "~/db.server";
 import { calculateYearLevel } from "~/services";
 
 export async function getMentorStudentsAsync(azureADId: string) {
-  const mentor = await prisma.mentor.findUniqueOrThrow({
+  const mentor = await prisma.volunteer.findUniqueOrThrow({
     where: {
       azureADId,
     },
@@ -11,9 +11,9 @@ export async function getMentorStudentsAsync(azureADId: string) {
     },
   });
 
-  const students = await prisma.mentorToStudentAssignement.findMany({
+  const students = await prisma.volunteerToStudentAssignement.findMany({
     where: {
-      mentorId: mentor.id,
+      volunteerId: mentor.id,
     },
     select: {
       student: {

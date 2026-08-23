@@ -59,9 +59,9 @@ export async function action({ request, params }: Route.ActionArgs) {
       },
       body: JSON.stringify({
         sessionId: session.id,
-        email: session.mentorSession.mentor.email,
-        mentorId: session.mentorSession.mentor.id,
-        mentorName: session.mentorSession.mentor.fullName,
+        email: session.volunteerSession.volunteer.email,
+        mentorId: session.volunteerSession.volunteer.id,
+        mentorName: session.volunteerSession.volunteer.fullName,
         studentId: session.studentSession.student.id,
         studentName: session.studentSession.student.fullName,
         attendedOn: dayjs(session.attendedOn).format("DD-MM-YYYY"),
@@ -87,7 +87,7 @@ export default function Index({
       signedOffOn,
       completedOn,
       isCancelled,
-      mentorSession,
+      volunteerSession,
       studentSession,
     },
   },
@@ -126,8 +126,8 @@ export default function Index({
     <>
       <div className="mb-4 flex flex-col gap-6 sm:flex-row">
         <Title className={isCancelled ? "text-error" : undefined}>
-          {dayjs(attendedOn).format("MMMM D, YYYY")} - mentor: &quot;
-          {mentorSession.mentor.fullName}&quot; student: &quot;
+          {dayjs(attendedOn).format("MMMM D, YYYY")} - volunteer: &quot;
+          {volunteerSession.volunteer.fullName}&quot; student: &quot;
           {studentSession.student.fullName}&quot;
         </Title>
 

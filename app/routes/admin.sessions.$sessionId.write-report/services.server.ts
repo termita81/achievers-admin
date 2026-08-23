@@ -21,9 +21,9 @@ export async function getSessionIdAsync(sessionId: number) {
       attendedOn: true,
       report: true,
       signedOffOn: true,
-      mentorSession: {
+      volunteerSession: {
         select: {
-          mentor: {
+          volunteer: {
             select: {
               id: true,
               fullName: true,

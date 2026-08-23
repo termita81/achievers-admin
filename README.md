@@ -94,12 +94,12 @@ CREATE PROCEDURE impersonate (IN sourceUserId INT, IN destinationUserId INT)
 BEGIN
 	SELECT azureADId
     INTO @sourceUserAzureADId
-    FROM achievers.Mentor
+    FROM achievers.Volunteer
     WHERE id = sourceUserId;
 
-	UPDATE achievers.Mentor SET azureADId = NULL WHERE id = sourceUserId;
+	UPDATE achievers.Volunteer SET azureADId = NULL WHERE id = sourceUserId;
 
-	UPDATE achievers.Mentor SET azureADId = @sourceUserAzureADId WHERE id = destinationUserId;
+	UPDATE achievers.Volunteer SET azureADId = @sourceUserAzureADId WHERE id = destinationUserId;
 END//
 ```
 

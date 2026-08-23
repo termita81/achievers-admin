@@ -26,9 +26,9 @@ export async function getSessionAsync(sessionId: number) {
           },
         },
       },
-      mentorSession: {
+      volunteerSession: {
         select: {
-          mentor: {
+          volunteer: {
             select: {
               id: true,
               fullName: true,

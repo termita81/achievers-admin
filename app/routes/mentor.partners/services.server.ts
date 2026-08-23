@@ -1,59 +1,60 @@
 import { prisma } from "~/db.server";
 
 export async function getPartnersAync(azureADId: string) {
-  const mentor = await prisma.mentor.findUniqueOrThrow({
+  const volunteer = await prisma.volunteer.findUniqueOrThrow({
     where: {
       azureADId,
     },
     select: {
       id: true,
-      mentorSharedTo: {
+      volunteerSharedTo: {
         select: {
-          mentorSharingId: true,
-          mentorSharedToId: true,
+          volunteerSharingId: true,
+          volunteerSharedToId: true,
         },
       },
-      mentorSharing: {
+      volunteerSharing: {
         select: {
-          mentorSharingId: true,
-          mentorSharedToId: true,
+          volunteerSharingId: true,
+          volunteerSharedToId: true,
         },
       },
     },
   });
 
-  const mentorShareToLookup = mentor.mentorSharedTo.reduce<
+  const volunteerShareToLookup = volunteer.volunteerSharedTo.reduce<
     Record<string, boolean>
-  >((res, { mentorSharingId }) => {
-    res[mentorSharingId.toString()] = true;
+  >((res, { volunteerSharingId }) => {
+    res[volunteerSharingId.toString()] = true;
     return res;
   }, {});
 
-  const sharingMentorInfoWithLookup = mentor.mentorSharing.reduce<
+  const sharingVolunteerInfoWithLookup = volunteer.volunteerSharing.reduce<
     Record<string, boolean>
-  >((res, { mentorSharedToId }) => {
-    res[mentorSharedToId.toString()] = true;
+  >((res, { volunteerSharedToId }) => {
+    res[volunteerSharedToId.toString()] = true;
     return res;
   }, {});
 
-  const studentAssignements = await prisma.mentorToStudentAssignement.findMany({
-    where: {
-      mentorId: mentor.id,
-    },
-    select: {
-      studentId: true,
-    },
-  });
+  const studentAssignements =
+    await prisma.volunteerToStudentAssignement.findMany({
+      where: {
+        volunteerId: volunteer.id,
+      },
+      select: {
+        studentId: true,
+      },
+    });
 
-  const partners = await prisma.mentorToStudentAssignement.findMany({
-    distinct: "mentorId",
+  const partners = await prisma.volunteerToStudentAssignement.findMany({
+    distinct: "volunteerId",
     where: {
       studentId: {
         in: studentAssignements.map(({ studentId }) => studentId),
       },
     },
     select: {
-      mentor: {
+      volunteer: {
         select: {
           id: true,
           fullName: true,
@@ -65,61 +66,61 @@ export async function getPartnersAync(azureADId: string) {
   });
 
   return partners
-    .filter(({ mentor: { id } }) => mentor.id !== id)
+    .filter(({ volunteer: { id } }) => volunteer.id !== id)
     .map((partner) => {
-      const isSharingWithMentor =
-        mentorShareToLookup[partner.mentor.id.toString()];
+      const isSharingWithVolunteer =
+        volunteerShareToLookup[partner.volunteer.id.toString()];
       const isInfoShared =
-        sharingMentorInfoWithLookup[partner.mentor.id.toString()];
+        sharingVolunteerInfoWithLookup[partner.volunteer.id.toString()];
 
       return {
-        ...partner.mentor,
+        ...partner.volunteer,
         isInfoShared,
-        email: isSharingWithMentor ? partner.mentor.email : null,
-        mobile: isSharingWithMentor ? partner.mentor.mobile : null,
+        email: isSharingWithVolunteer ? partner.volunteer.email : null,
+        mobile: isSharingWithVolunteer ? partner.volunteer.mobile : null,
       };
     });
 }
 
 export async function shareInfoWithPartner(
-  mentorAzureId: string,
-  mentorSharedToId: number,
+  volunteerAzureId: string,
+  volunteerSharedToId: number,
 ) {
-  const mentor = await prisma.mentor.findUniqueOrThrow({
+  const volunteer = await prisma.volunteer.findUniqueOrThrow({
     where: {
-      azureADId: mentorAzureId,
+      azureADId: volunteerAzureId,
     },
     select: {
       id: true,
     },
   });
 
-  return await prisma.mentorShareInfo.create({
+  return await prisma.volunteerShareInfo.create({
     data: {
-      mentorSharingId: mentor.id,
-      mentorSharedToId,
+      volunteerSharingId: volunteer.id,
+      volunteerSharedToId,
     },
   });
 }
 
 export async function removeShareInfo(
-  mentorAzureId: string,
-  mentorSharedToId: number,
+  volunteerAzureId: string,
+  volunteerSharedToId: number,
 ) {
-  const mentor = await prisma.mentor.findUniqueOrThrow({
+  const volunteer = await prisma.volunteer.findUniqueOrThrow({
     where: {
-      azureADId: mentorAzureId,
+      azureADId: volunteerAzureId,
     },
     select: {
       id: true,
     },
   });
 
-  return await prisma.mentorShareInfo.delete({
+  return await prisma.volunteerShareInfo.delete({
     where: {
-      mentorSharingId_mentorSharedToId: {
-        mentorSharingId: mentor.id,
-        mentorSharedToId,
+      volunteerSharingId_volunteerSharedToId: {
+        volunteerSharingId: volunteer.id,
+        volunteerSharedToId,
       },
     },
   });

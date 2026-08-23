@@ -7,7 +7,7 @@ export interface UpdateInductionCommand {
 }
 
 export async function getUserByIdAsync(id: number) {
-  return await prisma.mentor.findUniqueOrThrow({
+  return await prisma.volunteer.findUniqueOrThrow({
     where: {
       id,
     },
@@ -20,18 +20,18 @@ export async function getUserByIdAsync(id: number) {
 }
 
 export async function updateInductionAsync(
-  mentorId: number,
+  volunteerId: number,
   data: UpdateInductionCommand,
 ) {
   return await prisma.induction.upsert({
     where: {
-      mentorId,
+      volunteerId,
     },
     create: {
       completedOnDate: data.completedOnDate,
       runBy: data.runBy,
       comment: data.comment,
-      mentorId,
+      volunteerId,
     },
     update: {
       completedOnDate: data.completedOnDate,

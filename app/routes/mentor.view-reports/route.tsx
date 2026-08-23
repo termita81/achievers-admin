@@ -257,7 +257,7 @@ export default function Index({
                   signedOffOn,
                   attendedOn,
                   isCancelled,
-                  mentorSession,
+                  volunteerSession,
                   studentSession,
                 }) => (
                   <tr
@@ -268,8 +268,10 @@ export default function Index({
                     onClick={navigateToReport(id)}
                   >
                     <td className="p-2">
-                      {mentorSession.mentor.fullName}{" "}
-                      {mentorSession.mentor.id === loggedUserId ? "(Me)" : ""}
+                      {volunteerSession.volunteer.fullName}{" "}
+                      {volunteerSession.volunteer.id === loggedUserId
+                        ? "(Me)"
+                        : ""}
                     </td>
                     <td className="p-2">
                       {studentSession.student.fullName}{" "}

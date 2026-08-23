@@ -63,7 +63,7 @@ export default function Index({
       id,
       report,
       attendedOn,
-      mentorSession,
+      volunteerSession,
       studentSession: { studentId },
     },
   },
@@ -109,7 +109,7 @@ export default function Index({
       <div className="mb-4 flex flex-col gap-6 sm:flex-row">
         <Title>
           Report of &quot;{dayjs(attendedOn).format("DD/MM/YYYY")}&quot; on
-          behalf of &quot;{mentorSession.mentor.fullName}&quot;
+          behalf of &quot;{volunteerSession.volunteer.fullName}&quot;
         </Title>
 
         <Message key={Date.now()} successMessage={data?.successMessage} />

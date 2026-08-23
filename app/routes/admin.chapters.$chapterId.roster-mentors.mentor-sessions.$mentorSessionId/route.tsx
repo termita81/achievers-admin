@@ -31,21 +31,21 @@ export async function loader({ params }: Route.LoaderArgs) {
   invariant(params.chapterId, "chapterId not found");
   invariant(params.mentorSessionId, "mentorSessionId not found");
 
-  const [chapter, mentorSession] = await Promise.all([
+  const [chapter, volunteerSession] = await Promise.all([
     getChapterByIdAsync(Number(params.chapterId)),
     getMentorSessionByIdAsync(Number(params.mentorSessionId)),
   ]);
 
   const students = await getStudentsForMentorAsync(
-    mentorSession.chapterId,
-    mentorSession.mentor.id,
-    mentorSession.attendedOn,
+    volunteerSession.chapterId,
+    volunteerSession.volunteer.id,
+    volunteerSession.attendedOn,
   );
 
   return {
     chapter,
-    mentorSession,
-    attendedOnLabel: dayjs(mentorSession.attendedOn).format("MMMM D, YYYY"),
+    volunteerSession,
+    attendedOnLabel: dayjs(volunteerSession.attendedOn).format("MMMM D, YYYY"),
     students,
   };
 }
@@ -71,7 +71,7 @@ export async function action({ params, request }: Route.ActionArgs) {
     case "restoreAvailability": {
       const status = formData.get("status")!.toString();
 
-      const mentorSession = await restoreAvailabilityAsync(
+      const volunteerSession = await restoreAvailabilityAsync(
         Number(params.mentorSessionId),
         status,
       );
@@ -79,7 +79,7 @@ export async function action({ params, request }: Route.ActionArgs) {
       const parsedUrl = new URL(request.url);
 
       return redirect(
-        `/admin/chapters/${params.chapterId}/roster-mentors/${mentorSession.mentorId}/attended-on/${dayjs(mentorSession.attendedOn).format("YYYY-MM-DD")}/new?${parsedUrl.searchParams}`,
+        `/admin/chapters/${params.chapterId}/roster-mentors/${volunteerSession.volunteerId}/attended-on/${dayjs(volunteerSession.attendedOn).format("YYYY-MM-DD")}/new?${parsedUrl.searchParams}`,
       );
     }
     case "removeSession": {
@@ -89,7 +89,7 @@ export async function action({ params, request }: Route.ActionArgs) {
       const parsedUrl = new URL(request.url);
 
       return redirect(
-        `/admin/chapters/${params.chapterId}/roster-mentors/${session.mentorSession.mentorId}/attended-on/${dayjs(session.attendedOn).format("YYYY-MM-DD")}/new?${parsedUrl.searchParams}`,
+        `/admin/chapters/${params.chapterId}/roster-mentors/${session.volunteerSession.volunteerId}/attended-on/${dayjs(session.attendedOn).format("YYYY-MM-DD")}/new?${parsedUrl.searchParams}`,
       );
     }
     default:
@@ -102,7 +102,7 @@ export async function action({ params, request }: Route.ActionArgs) {
 }
 
 export default function Index({
-  loaderData: { attendedOnLabel, chapter, mentorSession, students },
+  loaderData: { attendedOnLabel, chapter, volunteerSession, students },
   actionData,
 }: Route.ComponentProps) {
   const [searchParams] = useSearchParams();
@@ -138,31 +138,31 @@ export default function Index({
 
         <div className="flex items-center justify-between gap-2 border-b border-gray-300 p-2">
           <div className="font-bold sm:w-72">Mentor</div>
-          <div className="sm:flex-1">{mentorSession.mentor.fullName}</div>
+          <div className="sm:flex-1">{volunteerSession.volunteer.fullName}</div>
         </div>
 
         <div className="flex items-center justify-between gap-2 border-b border-gray-300 p-2">
           <div className="font-bold sm:w-72">Status</div>
           <div className="sm:flex-1">
-            {mentorSession.status === "PENDING" && (
+            {volunteerSession.status === "PENDING" && (
               <span className="bg-warning flex gap-2 rounded p-1 font-semibold">
                 <WarningTriangle /> PENDING CONFIRMATION
               </span>
             )}
-            {mentorSession.status === "AVAILABLE" && (
+            {volunteerSession.status === "AVAILABLE" && (
               <span className="bg-success flex gap-2 rounded p-1 font-semibold">
-                <Check /> {mentorSession.status}
+                <Check /> {volunteerSession.status}
               </span>
             )}
-            {mentorSession.status === "UNAVAILABLE" && (
+            {volunteerSession.status === "UNAVAILABLE" && (
               <span className="bg-error flex gap-2 rounded p-1 font-semibold">
-                <WarningTriangle /> {mentorSession.status}
+                <WarningTriangle /> {volunteerSession.status}
               </span>
             )}
           </div>
         </div>
 
-        {mentorSession.status === "UNAVAILABLE" ? (
+        {volunteerSession.status === "UNAVAILABLE" ? (
           <Form
             method="POST"
             onSubmit={handleFormSubmit}
@@ -186,7 +186,7 @@ export default function Index({
             </button>
           </Form>
         ) : (
-          mentorSession.session.length === 0 && (
+          volunteerSession.session.length === 0 && (
             <Form
               method="POST"
               onSubmit={handleFormSubmit}
@@ -212,11 +212,11 @@ export default function Index({
           )
         )}
 
-        {mentorSession.status !== "UNAVAILABLE" && (
+        {volunteerSession.status !== "UNAVAILABLE" && (
           <>
             <Form method="POST" className="flex w-full items-end gap-4">
               <SelectSearch
-                key={mentorSession.session.length}
+                key={volunteerSession.session.length}
                 name="studentId"
                 placeholder="Select a student"
                 options={students}
@@ -254,7 +254,7 @@ export default function Index({
                   </tr>
                 </thead>
                 <tbody>
-                  {mentorSession.session.map(
+                  {volunteerSession.session.map(
                     ({
                       id,
                       completedOn,

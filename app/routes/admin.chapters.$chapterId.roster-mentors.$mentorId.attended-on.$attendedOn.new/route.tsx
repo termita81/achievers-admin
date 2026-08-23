@@ -22,17 +22,17 @@ export async function loader({ params, request }: Route.LoaderArgs) {
 
   const selectedMentorId = Number(params.mentorId);
 
-  const mentorSession = await getMentorSessionForDateAsync(
+  const volunteerSession = await getMentorSessionForDateAsync(
     Number(params.chapterId),
     Number(params.mentorId),
     params.attendedOn,
   );
 
-  if (mentorSession !== null) {
+  if (volunteerSession !== null) {
     const url = new URL(request.url);
 
     return redirect(
-      `/admin/chapters/${params.chapterId}/roster-mentors/mentor-sessions/${mentorSession.id}?${url.searchParams}`,
+      `/admin/chapters/${params.chapterId}/roster-mentors/mentor-sessions/${volunteerSession.id}?${url.searchParams}`,
     );
   }
 

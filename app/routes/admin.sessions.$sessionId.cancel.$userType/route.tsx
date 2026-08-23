@@ -113,7 +113,7 @@ export default function Index({
           &quot;
           {params.userType === "student"
             ? session.studentSession.student.fullName
-            : session.mentorSession.mentor.fullName}
+            : session.volunteerSession.volunteer.fullName}
           &quot; for session of &quot;
           {dayjs(session.attendedOn).format("MMMM D, YYYY")}
           &quot;
@@ -128,12 +128,12 @@ export default function Index({
             Yuo are about to mark ABSENT &quot;
             {params.userType === "student"
               ? session.studentSession.student.fullName
-              : session.mentorSession.mentor.fullName}
+              : session.volunteerSession.volunteer.fullName}
             &quot; for the session of{" "}
             {dayjs(session.attendedOn).format("MMMM D, YYYY")} with &quot;
             {params.userType === "student"
               ? session.studentSession.student.fullName
-              : session.studentSession.student.fullName}
+              : session.volunteerSession.volunteer.fullName}
             &quot;
           </p>
 

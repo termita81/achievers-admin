@@ -10,7 +10,7 @@ import { prisma } from "~/db.server";
 import { addCollectionToSpreadsheet } from "~/services/.server";
 
 export async function exportMentorsToSpreadsheetAsync() {
-  const mentors = await prisma.mentor.findMany({
+  const mentors = await prisma.volunteer.findMany({
     include: {
       chapter: true,
       importedHistory: {

@@ -78,7 +78,7 @@ export default function Index({
       chapterId,
       fullName,
       frequencyInDays,
-      mentorToStudentAssignement,
+      volunteerToStudentAssignement,
     },
   },
 }: Route.ComponentProps) {
@@ -177,11 +177,11 @@ export default function Index({
 
         <div>
           <h4>Assigned students</h4>
-          {mentorToStudentAssignement.length === 0 && (
+          {volunteerToStudentAssignement.length === 0 && (
             <p className="italic">No students assigned</p>
           )}
           <ol>
-            {mentorToStudentAssignement.map(
+            {volunteerToStudentAssignement.map(
               ({ student: { id: studentId, fullName, endDate } }) => (
                 <li key={studentId} className="border-b border-gray-300 pb-2">
                   <div

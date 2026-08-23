@@ -42,7 +42,7 @@ export async function saveUserProfilePicture(
     throw new Error(resp.errorCode);
   }
 
-  await prisma.mentor.update({
+  await prisma.volunteer.update({
     where: {
       id: userId,
     },
@@ -66,7 +66,7 @@ export async function deleteUserProfilePicture(userId: number): Promise<void> {
     trackException(Error(resp.errorCode));
   }
 
-  await prisma.mentor.update({
+  await prisma.volunteer.update({
     where: {
       id: userId,
     },

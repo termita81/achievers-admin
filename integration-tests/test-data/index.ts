@@ -53,10 +53,10 @@ export async function seedForWriteReportAsync() {
 
     await prisma.$transaction(async (tx) => {
       await tx.session.deleteMany();
-      await tx.mentorSession.deleteMany();
+      await tx.volunteerSession.deleteMany();
       await tx.studentSession.deleteMany();
 
-      const testMentor = await tx.mentor.findUniqueOrThrow({
+      const testVolunteer = await tx.volunteer.findUniqueOrThrow({
         where: {
           email: "test_0@test.com",
         },
@@ -67,9 +67,9 @@ export async function seedForWriteReportAsync() {
       });
 
       const studentAssignment =
-        await tx.mentorToStudentAssignement.findFirstOrThrow({
+        await tx.volunteerToStudentAssignement.findFirstOrThrow({
           where: {
-            mentorId: testMentor.id,
+            volunteerId: testVolunteer.id,
           },
           select: {
             studentId: true,
@@ -78,16 +78,16 @@ export async function seedForWriteReportAsync() {
 
       const studentSession = await tx.studentSession.create({
         data: {
-          chapterId: testMentor.chapterId,
+          chapterId: testVolunteer.chapterId,
           studentId: studentAssignment.studentId,
           attendedOn: new Date("2024-11-23T00:00:00.000Z"),
         },
       });
 
-      const mentorSession = await tx.mentorSession.create({
+      const volunteerSession = await tx.volunteerSession.create({
         data: {
-          chapterId: testMentor.chapterId,
-          mentorId: testMentor.id,
+          chapterId: testVolunteer.chapterId,
+          volunteerId: testVolunteer.id,
           attendedOn: new Date("2024-11-23T00:00:00.000Z"),
         },
       });
@@ -97,7 +97,7 @@ export async function seedForWriteReportAsync() {
           attendedOn: new Date("2024-11-23T00:00:00.000Z"),
           chapterId: 1,
           studentSessionId: studentSession.id,
-          mentorSessionId: mentorSession.id,
+          volunteerSessionId: volunteerSession.id,
         },
       });
     });
@@ -116,10 +116,10 @@ export async function seedSessionsFroHomePageAsync() {
 
     await prisma.$transaction(async (tx) => {
       await tx.session.deleteMany();
-      await tx.mentorSession.deleteMany();
+      await tx.volunteerSession.deleteMany();
       await tx.studentSession.deleteMany();
 
-      const testMentor = await tx.mentor.findUniqueOrThrow({
+      const testVolunteer = await tx.volunteer.findUniqueOrThrow({
         where: {
           email: "test_0@test.com",
         },
@@ -129,30 +129,31 @@ export async function seedSessionsFroHomePageAsync() {
         },
       });
 
-      const studentAssignments = await tx.mentorToStudentAssignement.findMany({
-        where: {
-          mentorId: testMentor.id,
-        },
-        select: {
-          studentId: true,
-        },
-      });
+      const studentAssignments =
+        await tx.volunteerToStudentAssignement.findMany({
+          where: {
+            volunteerId: testVolunteer.id,
+          },
+          select: {
+            studentId: true,
+          },
+        });
 
       // Next session
       const nextSessionDate = new Date("2024-11-30T00:00:00.000Z");
 
       const studentNextSession = await tx.studentSession.create({
         data: {
-          chapterId: testMentor.chapterId,
+          chapterId: testVolunteer.chapterId,
           studentId: studentAssignments[0].studentId,
           attendedOn: nextSessionDate,
         },
       });
 
-      const mentorNextSession = await tx.mentorSession.create({
+      const volunteerNextSession = await tx.volunteerSession.create({
         data: {
-          chapterId: testMentor.chapterId,
-          mentorId: testMentor.id,
+          chapterId: testVolunteer.chapterId,
+          volunteerId: testVolunteer.id,
           attendedOn: nextSessionDate,
         },
       });
@@ -162,7 +163,7 @@ export async function seedSessionsFroHomePageAsync() {
           attendedOn: nextSessionDate,
           chapterId: 1,
           studentSessionId: studentNextSession.id,
-          mentorSessionId: mentorNextSession.id,
+          volunteerSessionId: volunteerNextSession.id,
         },
       });
 
@@ -172,16 +173,16 @@ export async function seedSessionsFroHomePageAsync() {
 
       const studentSession1 = await tx.studentSession.create({
         data: {
-          chapterId: testMentor.chapterId,
+          chapterId: testVolunteer.chapterId,
           studentId: studentAssignments[1].studentId,
           attendedOn: sessionDate1,
         },
       });
 
-      const mentorSession1 = await tx.mentorSession.create({
+      const volunteerSession1 = await tx.volunteerSession.create({
         data: {
-          chapterId: testMentor.chapterId,
-          mentorId: testMentor.id,
+          chapterId: testVolunteer.chapterId,
+          volunteerId: testVolunteer.id,
           attendedOn: sessionDate1,
         },
       });
@@ -191,7 +192,7 @@ export async function seedSessionsFroHomePageAsync() {
           attendedOn: sessionDate1,
           chapterId: 1,
           studentSessionId: studentSession1.id,
-          mentorSessionId: mentorSession1.id,
+          volunteerSessionId: volunteerSession1.id,
           report:
             '{"root":{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"Hello this is my first report!","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""}],"direction":"ltr","format":"","indent":0,"type":"root","version":1}}',
           completedOn: new Date("2024-11-16T00:00:00.000Z"),

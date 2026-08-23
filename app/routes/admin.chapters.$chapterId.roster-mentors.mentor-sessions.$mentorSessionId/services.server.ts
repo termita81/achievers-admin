@@ -20,7 +20,7 @@ export async function getChapterByIdAsync(id: number) {
 }
 
 export async function getMentorSessionByIdAsync(mentorSessionId: number) {
-  return await prisma.mentorSession.findUniqueOrThrow({
+  return await prisma.volunteerSession.findUniqueOrThrow({
     where: {
       id: mentorSessionId,
     },
@@ -29,7 +29,7 @@ export async function getMentorSessionByIdAsync(mentorSessionId: number) {
       chapterId: true,
       attendedOn: true,
       status: true,
-      mentor: {
+      volunteer: {
         select: {
           id: true,
           fullName: true,
@@ -65,12 +65,12 @@ export async function restoreAvailabilityAsync(
 ) {
   const sessionCount = await prisma.session.count({
     where: {
-      mentorSessionId,
+      volunteerSessionId: mentorSessionId,
     },
   });
 
   if (sessionCount > 0) {
-    return await prisma.mentorSession.update({
+    return await prisma.volunteerSession.update({
       where: {
         id: mentorSessionId,
       },
@@ -79,19 +79,19 @@ export async function restoreAvailabilityAsync(
       },
       select: {
         id: true,
-        mentorId: true,
+        volunteerId: true,
         attendedOn: true,
       },
     });
   }
 
-  return await prisma.mentorSession.delete({
+  return await prisma.volunteerSession.delete({
     where: {
       id: mentorSessionId,
     },
     select: {
       id: true,
-      mentorId: true,
+      volunteerId: true,
       attendedOn: true,
     },
   });
@@ -106,12 +106,12 @@ export async function removeSessionAsync(sessionId: number) {
       id: true,
       chapterId: true,
       attendedOn: true,
-      mentorSessionId: true,
+      volunteerSessionId: true,
       studentSessionId: true,
       isCancelled: true,
-      mentorSession: {
+      volunteerSession: {
         select: {
-          mentorId: true,
+          volunteerId: true,
         },
       },
     },
@@ -130,14 +130,14 @@ export async function removeSessionAsync(sessionId: number) {
 
     const sessionsForMentorCount = await tx.session.count({
       where: {
-        mentorSessionId: session.mentorSessionId,
+        volunteerSessionId: session.volunteerSessionId,
       },
     });
 
     if (sessionsForMentorCount === 0) {
-      await tx.mentorSession.delete({
+      await tx.volunteerSession.delete({
         where: {
-          id: session.mentorSessionId,
+          id: session.volunteerSessionId,
         },
       });
     }
@@ -171,12 +171,12 @@ export async function getStudentsForMentorAsync(
     SELECT id, fullName
     FROM Student
     WHERE chapterId = ${chapterId} AND endDate IS NULL
-      AND id NOT IN (SELECT studentId FROM MentorToStudentAssignement WHERE mentorId = ${mentorId})
+      AND id NOT IN (SELECT studentId FROM VolunteerToStudentAssignement WHERE volunteerId = ${mentorId})
     ORDER BY fullName ASC`;
 
-  const assignedStudents = await prisma.mentorToStudentAssignement.findMany({
+  const assignedStudents = await prisma.volunteerToStudentAssignement.findMany({
     where: {
-      mentorId,
+      volunteerId: mentorId,
     },
     select: {
       student: {
@@ -234,7 +234,7 @@ export async function addStudentToSessionAsync({
   studentId,
 }: SessionCommandCreate) {
   return await prisma.$transaction(async (tx) => {
-    const mentorSession = await tx.mentorSession.findUniqueOrThrow({
+    const volunteerSession = await tx.volunteerSession.findUniqueOrThrow({
       where: {
         id: mentorSessionId,
       },
@@ -248,8 +248,8 @@ export async function addStudentToSessionAsync({
     let studentSession = await tx.studentSession.findUnique({
       where: {
         chapterId_studentId_attendedOn: {
-          chapterId: mentorSession.chapterId,
-          attendedOn: mentorSession.attendedOn,
+          chapterId: volunteerSession.chapterId,
+          attendedOn: volunteerSession.attendedOn,
           studentId,
         },
       },
@@ -260,8 +260,8 @@ export async function addStudentToSessionAsync({
 
     studentSession ??= await tx.studentSession.create({
       data: {
-        chapterId: mentorSession.chapterId,
-        attendedOn: mentorSession.attendedOn,
+        chapterId: volunteerSession.chapterId,
+        attendedOn: volunteerSession.attendedOn,
         studentId,
       },
       select: {
@@ -271,9 +271,9 @@ export async function addStudentToSessionAsync({
 
     return await tx.session.create({
       data: {
-        chapterId: mentorSession.chapterId,
-        attendedOn: mentorSession.attendedOn,
-        mentorSessionId: mentorSession.id,
+        chapterId: volunteerSession.chapterId,
+        attendedOn: volunteerSession.attendedOn,
+        volunteerSessionId: volunteerSession.id,
         studentSessionId: studentSession.id,
       },
     });

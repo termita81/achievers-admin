@@ -8,7 +8,7 @@ dayjs.extend(utc);
 
 export interface Attendance {
   id: number;
-  mentor: {
+  volunteer: {
     id: number;
     fullName: string;
   };
@@ -18,7 +18,7 @@ export async function getMentorsForSession(
   chapterId: number,
   searchTerm: string | null,
 ) {
-  return await prisma.mentor.findMany({
+  return await prisma.volunteer.findMany({
     where: {
       endDate: null,
       chapterId,
@@ -42,14 +42,14 @@ export async function getMentorAttendancesLookup(
   chapterId: number,
   sessionDate: string,
 ) {
-  const attendaces = await prisma.mentorAttendance.findMany({
+  const attendaces = await prisma.volunteerAttendance.findMany({
     where: {
       chapterId,
       attendedOn: dayjs.utc(sessionDate, "YYYY-MM-DD").toDate(),
     },
     select: {
       id: true,
-      mentor: {
+      volunteer: {
         select: {
           id: true,
           fullName: true,
@@ -59,7 +59,7 @@ export async function getMentorAttendancesLookup(
   });
 
   return attendaces.reduce<Record<number, Attendance>>((result, attendace) => {
-    result[attendace.mentor.id] = attendace;
+    result[attendace.volunteer.id] = attendace;
 
     return result;
   }, {});
@@ -70,17 +70,17 @@ export async function attendSession(
   mentorId: number,
   attendedOn: string,
 ) {
-  return await prisma.mentorAttendance.create({
+  return await prisma.volunteerAttendance.create({
     data: {
       chapterId,
-      mentorId,
+      volunteerId: mentorId,
       attendedOn,
     },
   });
 }
 
 export async function removeAttendace(attendanceId: number) {
-  return await prisma.mentorAttendance.delete({
+  return await prisma.volunteerAttendance.delete({
     where: {
       id: attendanceId,
     },

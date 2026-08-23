@@ -15,7 +15,7 @@ export interface UpdateWWCCheckCommand {
 }
 
 export async function getUserByIdAsync(id: number) {
-  return await prisma.mentor.findUniqueOrThrow({
+  return await prisma.volunteer.findUniqueOrThrow({
     where: {
       id,
     },
@@ -35,13 +35,13 @@ export async function updateWWCCheckAsync(
 
   return await prisma.wWCCheck.upsert({
     where: {
-      mentorId,
+      volunteerId: mentorId,
     },
     create: {
       expiryDate,
       filePath: data.filePath,
       wwcNumber: data.wwcNumber,
-      mentorId,
+      volunteerId: mentorId,
     },
     update: {
       expiryDate,

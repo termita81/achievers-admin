@@ -204,13 +204,13 @@ export default function Index({
                 </td>
               </tr>
             )}
-            {attendances.map(({ id, attendedOn, chapter, mentor }) => (
+            {attendances.map(({ id, attendedOn, chapter, volunteer }) => (
               <tr key={id}>
                 <td className="p-2">
                   {dayjs(attendedOn).format("D MMMM YYYY")}
                 </td>
                 <td className="p-2">{chapter.name}</td>
-                <td>{mentor.fullName}</td>
+                <td>{volunteer.fullName}</td>
               </tr>
             ))}
           </tbody>

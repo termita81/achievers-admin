@@ -13,7 +13,7 @@ export async function getStudentByIdAsync(id: number) {
 }
 
 export async function getUserByAzureADIdAsync(azureADId: string) {
-  return await prisma.mentor.findUniqueOrThrow({
+  return await prisma.volunteer.findUniqueOrThrow({
     where: {
       azureADId,
       endDate: null,

@@ -355,7 +355,7 @@ export default function Index({
                   </div>
                 </th>
                 {datesInTerm.map((attendedOn) => {
-                  const mentorSession = sessionLookup?.[attendedOn];
+                  const volunteerSession = sessionLookup?.[attendedOn];
 
                   let hasReport = false;
                   let completedOn = null;
@@ -364,20 +364,20 @@ export default function Index({
                   let textHighlight = false;
                   let textHighlightError = false;
 
-                  let to = mentorSession?.mentorSessionId
-                    ? `/admin/chapters/${chapterId}/roster-mentors/mentor-sessions/${mentorSession.mentorSessionId}`
+                  let to = volunteerSession?.volunteerSessionId
+                    ? `/admin/chapters/${chapterId}/roster-mentors/mentor-sessions/${volunteerSession.volunteerSessionId}`
                     : `/admin/chapters/${chapterId}/roster-mentors/${mentorId}/attended-on/${attendedOn}/new`;
 
-                  if (mentorSession) {
-                    if (mentorSession.status === "UNAVAILABLE") {
+                  if (volunteerSession) {
+                    if (volunteerSession.status === "UNAVAILABLE") {
                       textHighlightError = true;
                       label = "Unavailable";
                     } else {
-                      if (mentorSession.sessions.length === 0) {
+                      if (volunteerSession.sessions.length === 0) {
                         textHighlight = true;
                         label = "Available";
-                      } else if (mentorSession.sessions.length === 1) {
-                        const session = mentorSession.sessions[0];
+                      } else if (volunteerSession.sessions.length === 1) {
+                        const session = volunteerSession.sessions[0];
                         hasReport = session.hasReport;
                         completedOn = session.completedOn;
                         isCancelled = session.isCancelled;
@@ -390,7 +390,7 @@ export default function Index({
                           to = `/admin/sessions/${session.sessionId}/report`;
                         }
                       } else {
-                        label = `${mentorSession.sessions.length} Students`;
+                        label = `${volunteerSession.sessions.length} Students`;
                       }
                     }
                   }
@@ -419,7 +419,7 @@ export default function Index({
                           </div>
                         )}
                         {!isCancelled &&
-                          mentorSession?.status === "PENDING" && (
+                          volunteerSession?.status === "PENDING" && (
                             <div className="badge indicator-item badge-warning indicator-center gap-1">
                               <WarningTriangleSolid className="h-4 w-4" />{" "}
                               Pending

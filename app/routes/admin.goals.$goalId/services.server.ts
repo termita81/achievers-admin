@@ -12,7 +12,7 @@ export async function getGoalById(id: number) {
       result: true,
       endDate: true,
       isAchieved: true,
-      mentor: {
+      volunteer: {
         select: {
           id: true,
           fullName: true,

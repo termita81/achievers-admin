@@ -17,7 +17,7 @@ export interface GoalCommad {
 }
 
 export async function getUserByAzureADIdAsync(azureADId: string) {
-  return await prisma.mentor.findUniqueOrThrow({
+  return await prisma.volunteer.findUniqueOrThrow({
     where: {
       azureADId,
       endDate: null,
@@ -61,7 +61,7 @@ export async function createGoalAsync(data: GoalCommad) {
   const { id } = await prisma.goal.create({
     data: {
       chapterId: data.chapterId,
-      mentorId: data.mentorId,
+      volunteerId: data.mentorId,
       studentId: data.studentId,
       endDate: dayjs.utc(data.endDate, "YYYY-MM-DD").toDate(),
       goal: data.goal,

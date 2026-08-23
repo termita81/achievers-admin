@@ -21,7 +21,7 @@ interface StudentSession {
   hasReport: number | null;
   completedOn: string | null;
   isCancelled: number | null;
-  mentorId: number | null;
+  volunteerId: number | null;
   mentorFullName: string | null;
 }
 
@@ -41,7 +41,7 @@ type SessionLookup = Record<
       hasReport: boolean;
       completedOn: string | null;
       isCancelled: boolean;
-      mentorId: number;
+      volunteerId: number;
       mentorFullName: string;
     }[];
   }
@@ -92,12 +92,12 @@ export async function getStudentsAsync(
       sa.hasReport,
       sa.completedOn,
       sa.isCancelled,
-      ms.mentorId,
+      ms.volunteerId,
       m.fullName AS mentorFullName
     FROM StudentSession ss
     LEFT JOIN Session sa ON sa.studentSessionId = ss.id
-    LEFT JOIN MentorSession ms ON ms.id = sa.mentorSessionId
-    LEFT JOIN Mentor m ON m.id = ms.mentorId
+    LEFT JOIN VolunteerSession ms ON ms.id = sa.volunteerSessionId
+    LEFT JOIN Volunteer m ON m.id = ms.volunteerId
     WHERE ss.chapterId = ${chapterId}
       AND ss.attendedOn ${termDate ? Prisma.sql`= ${dayjs(termDate).format("YYYY-MM-DD")}` : Prisma.sql`BETWEEN ${term.start.utc().format("YYYY-MM-DD")} AND ${term.end.utc().format("YYYY-MM-DD")}`}`;
 
@@ -113,7 +113,7 @@ export async function getStudentsAsync(
       status: studentSession.status,
       attendedOn: studentSession.attendedOn,
       studentId: studentSession.studentId,
-      mentorId: studentSession.mentorId!,
+      volunteerId: studentSession.volunteerId!,
       sessionId: studentSession.sessionId!,
       hasReport: studentSession.hasReport === 1,
       completedOn: studentSession.completedOn,

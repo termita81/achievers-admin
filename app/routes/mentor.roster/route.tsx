@@ -433,7 +433,7 @@ export default function Index({
                       <div className="text-error flex items-center justify-center gap-2 border-b pb-2 sm:justify-start">
                         <ThumbsDown className="h-4 w-4 sm:h-6 sm:w-6" />
                         <span className="font-bold">
-                          {myPartnersMentorSession.mentor.fullName}
+                          {myPartnersMentorSession.volunteer.fullName}
                         </span>{" "}
                         is <span className="font-bold">unavailable</span>
                       </div>
@@ -468,7 +468,7 @@ export default function Index({
                                 <div className="text-info flex items-center justify-center gap-2 sm:justify-start">
                                   <Group className="h-4 w-4 sm:h-6 sm:w-6" />
                                   <span className="font-bold">
-                                    {myPartnersMentorSession.mentor.fullName}
+                                    {myPartnersMentorSession.volunteer.fullName}
                                   </span>{" "}
                                   is mentoring{" "}
                                   <span className="font-bold">

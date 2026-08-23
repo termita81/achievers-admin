@@ -72,12 +72,12 @@ export async function action({ request, params }: Route.ActionArgs) {
 export default function Index({
   loaderData: {
     availableMentors,
-    studentWithMentors: { fullName, mentorToStudentAssignement },
+    studentWithMentors: { fullName, volunteerToStudentAssignement },
   },
 }: Route.ComponentProps) {
   const { state, Form, data, submit } = useFetcher<{
     message: string | null;
-    mentorId: string;
+    volunteerId: string;
   }>();
   const isLoading = state !== "idle";
 
@@ -112,7 +112,7 @@ export default function Index({
             >
               <div className="w-full sm:w-96">
                 <SelectSearch
-                  key={data?.mentorId}
+                  key={data?.volunteerId}
                   showClearButton
                   name="mentorId"
                   placeholder="start typing to select a mentor"
@@ -153,10 +153,10 @@ export default function Index({
         <hr />
 
         <div>
-          <h4>Assigned mentors</h4>
+          <h4>Assigned volunteers</h4>
           <ol>
-            {mentorToStudentAssignement.map(
-              ({ mentor: { id, fullName, frequencyInDays } }) => (
+            {volunteerToStudentAssignement.map(
+              ({ volunteer: { id, fullName, frequencyInDays } }) => (
                 <li key={id} className="border-b border-gray-300 pb-2">
                   <div className="flex flex-wrap items-center justify-between">
                     <div className="flex gap-2">

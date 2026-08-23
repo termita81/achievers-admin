@@ -154,18 +154,18 @@ export default function Index({
             </thead>
             <tbody>
               {mentorsWithStudents.map(
-                ({ id, fullName, mentorToStudentAssignement }) => (
+                ({ id, fullName, volunteerToStudentAssignement }) => (
                   <tr key={id}>
                     <td className="p-2">{fullName}</td>
                     <td>
                       <ul className="list-disc pl-2">
-                        {mentorToStudentAssignement.map(({ mentor }) => (
-                          <li key={mentor.id}>
-                            <span>{mentor.fullName}</span>{" "}
+                        {volunteerToStudentAssignement.map(({ volunteer }) => (
+                          <li key={volunteer.id}>
+                            <span>{volunteer.fullName}</span>{" "}
                             <span className="italic">
-                              {mentor.frequencyInDays === 14
+                              {volunteer.frequencyInDays === 14
                                 ? "(Fortnightly)"
-                                : mentor.frequencyInDays === 7
+                                : volunteer.frequencyInDays === 7
                                   ? "(Weekly)"
                                   : "(Frequency not specified)"}
                             </span>

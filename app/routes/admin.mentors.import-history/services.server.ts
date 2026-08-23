@@ -8,7 +8,7 @@ export async function getImportHistoryAsync(
     select: {
       error: true,
       createdAt: true,
-      mentor: {
+      volunteer: {
         select: {
           id: true,
           fullName: true,

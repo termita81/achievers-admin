@@ -9,10 +9,10 @@ export async function getSessionsCountAsync(
   chapterId: number,
   term: Term,
 ) {
-  return await prisma.mentorSession.count({
+  return await prisma.volunteerSession.count({
     where: {
       chapterId,
-      mentorId,
+      volunteerId: mentorId,
       attendedOn: {
         gte: term.start.toDate(),
         lte: term.end.toDate(),
@@ -28,10 +28,10 @@ export async function getSessionsAsync(
   term: Term,
   numberItems = 10,
 ) {
-  const mentorSessions = await prisma.mentorSession.findMany({
+  const volunteerSessions = await prisma.volunteerSession.findMany({
     where: {
       chapterId,
-      mentorId,
+      volunteerId: mentorId,
       attendedOn: {
         gte: term.start.toDate(),
         lte: term.end.toDate(),
@@ -67,7 +67,7 @@ export async function getSessionsAsync(
     take: numberItems,
   });
 
-  return mentorSessions.flatMap(({ attendedOn, session }) => {
+  return volunteerSessions.flatMap(({ attendedOn, session }) => {
     const date = dayjs(attendedOn);
     const daysDiff = date.diff(new Date(), "days");
 
@@ -80,7 +80,7 @@ export async function getSessionsAsync(
 }
 
 export async function getUserByAzureADIdAsync(azureADId: string) {
-  return await prisma.mentor.findUniqueOrThrow({
+  return await prisma.volunteer.findUniqueOrThrow({
     where: {
       azureADId,
       endDate: null,
@@ -106,9 +106,9 @@ export async function sessionsStatsAsync(userId: number) {
       COUNT(*) sessionCount,
       COUNT(s.report) reportCount,
       MIN(s.attendedOn) minAttendedOn
-    FROM MentorSession ms
-    INNER JOIN Session s ON s.mentorSessionId = ms.id
-    WHERE ms.mentorId = ${userId} AND ms.status = 'AVAILABLE' AND s.attendedOn <= ${dayjs().format("YYYY-MM-DD")}`;
+    FROM VolunteerSession ms
+    INNER JOIN Session s ON s.volunteerSessionId = ms.id
+    WHERE ms.volunteerId = ${userId} AND ms.status = 'AVAILABLE' AND s.attendedOn <= ${dayjs().format("YYYY-MM-DD")}`;
 
   return sessionStats?.[0] ?? null;
 }
@@ -117,10 +117,10 @@ export async function studentsMentoredAsync(userId: number) {
   const studentsMentored = await prisma.$queryRaw<{ studentId: number }[]>`
     SELECT
       ss.studentId
-    FROM MentorSession ms
-    INNER JOIN Session s ON s.mentorSessionId = ms.id
+    FROM VolunteerSession ms
+    INNER JOIN Session s ON s.volunteerSessionId = ms.id
     INNER JOIN StudentSession ss ON ss.id = s.studentSessionId
-    WHERE ms.mentorId = ${userId}
+    WHERE ms.volunteerId = ${userId}
     GROUP BY ss.studentId`;
 
   return studentsMentored.length;

@@ -6,13 +6,13 @@ export interface CategoryOrderCommand {
 }
 
 export async function getMentorResourcesAsync() {
-  return await prisma.mentorResourceCategory.findMany({
+  return await prisma.volunteerResourceCategory.findMany({
     select: {
       id: true,
       label: true,
       _count: {
         select: {
-          mentorResource: true,
+          volunteerResource: true,
         },
       },
     },
@@ -27,7 +27,7 @@ export async function updateCategoryOrder(
 ) {
   await prisma.$transaction(async (tx) => {
     const updatePromises = categoryOrders.map(({ id, order }) =>
-      tx.mentorResourceCategory.update({
+      tx.volunteerResourceCategory.update({
         where: {
           id,
         },

@@ -31,7 +31,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
 }
 
 export default function Index({
-  loaderData: { fullName, endDate, mentorNotes },
+  loaderData: { fullName, endDate, volunteerNotes },
 }: Route.ComponentProps) {
   return (
     <>
@@ -47,8 +47,8 @@ export default function Index({
 
       <p className="my-4">Reason:</p>
 
-      {mentorNotes.length > 0 && (
-        <Textarea defaultValue={mentorNotes[0].note} readOnly disabled />
+      {volunteerNotes.length > 0 && (
+        <Textarea defaultValue={volunteerNotes[0].note} readOnly disabled />
       )}
     </>
   );

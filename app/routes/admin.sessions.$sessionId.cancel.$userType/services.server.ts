@@ -23,9 +23,9 @@ export async function getSession(sessionId: number) {
       isCancelled: true,
       cancelledReasonId: true,
       report: true,
-      mentorSession: {
+      volunteerSession: {
         select: {
-          mentor: {
+          volunteer: {
             select: {
               id: true,
               fullName: true,

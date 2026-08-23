@@ -9,7 +9,7 @@ export interface UpdateApprovalByMRCCommand {
 }
 
 export async function getUserByIdAsync(id: number) {
-  return await prisma.mentor.findUniqueOrThrow({
+  return await prisma.volunteer.findUniqueOrThrow({
     where: {
       id,
     },
@@ -22,20 +22,20 @@ export async function getUserByIdAsync(id: number) {
 }
 
 export async function updateApprovalByMRCAsync(
-  mentorId: number,
+  volunteerId: number,
   data: UpdateApprovalByMRCCommand,
 ) {
   const submittedDate = dayjs(data.submittedDate).toDate();
 
   return await prisma.approvalbyMRC.upsert({
     where: {
-      mentorId,
+      volunteerId,
     },
     create: {
       completedBy: data.completedBy,
       submittedDate,
       comment: data.comment,
-      mentorId,
+      volunteerId,
     },
     update: {
       completedBy: data.completedBy,

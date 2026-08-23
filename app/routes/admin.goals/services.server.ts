@@ -21,11 +21,11 @@ export async function getAvailabelMentorsAsync(
   chapterId: number,
   studentId: number | undefined,
 ) {
-  return await prisma.mentor.findMany({
+  return await prisma.volunteer.findMany({
     where: {
       chapter: accessibleBy(ability).ofType("Chapter"),
       chapterId,
-      mentorToStudentAssignement: {
+      volunteerToStudentAssignement: {
         some: {
           studentId,
         },
@@ -50,9 +50,9 @@ export async function getAvailabelStudentsAsync(
     where: {
       chapter: accessibleBy(ability).ofType("Chapter"),
       chapterId,
-      mentorToStudentAssignement: {
+      volunteerToStudentAssignement: {
         some: {
-          mentorId,
+          volunteerId: mentorId,
         },
       },
     },
@@ -100,7 +100,7 @@ export async function getStudentGoalsAsync(
           name: true,
         },
       },
-      mentor: {
+      volunteer: {
         select: {
           id: true,
           fullName: true,

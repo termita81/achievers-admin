@@ -43,10 +43,10 @@ export async function getStudentSessionByIdAsync(studentSessionId: number) {
           completedOn: true,
           signedOffOn: true,
           isCancelled: true,
-          mentorSession: {
+          volunteerSession: {
             select: {
               id: true,
-              mentor: {
+              volunteer: {
                 select: {
                   id: true,
                   fullName: true,
@@ -67,17 +67,17 @@ export async function getMentorsForStudentAsync(
 ) {
   const allMentors = await prisma.$queryRaw<{ id: number; fullName: string }[]>`
     SELECT id, fullName
-    FROM Mentor
+    FROM Volunteer
     WHERE chapterId = ${chapterId} AND endDate IS NULL
-      AND id NOT IN (SELECT mentorId FROM MentorToStudentAssignement WHERE studentId = ${studentId})
+      AND id NOT IN (SELECT volunteerId FROM VolunteerToStudentAssignement WHERE studentId = ${studentId})
     ORDER BY fullName ASC`;
 
-  const assignedMentors = await prisma.mentorToStudentAssignement.findMany({
+  const assignedMentors = await prisma.volunteerToStudentAssignement.findMany({
     where: {
       studentId,
     },
     select: {
-      mentor: {
+      volunteer: {
         select: {
           id: true,
           fullName: true,
@@ -85,33 +85,33 @@ export async function getMentorsForStudentAsync(
       },
     },
     orderBy: {
-      mentor: {
+      volunteer: {
         fullName: "asc",
       },
     },
   });
 
-  const unavailableMentors = await prisma.mentorSession.findMany({
+  const unavailableMentors = await prisma.volunteerSession.findMany({
     where: {
       chapterId,
       attendedOn,
       status: "UNAVAILABLE",
     },
     select: {
-      mentorId: true,
+      volunteerId: true,
     },
   });
 
   const unavailableMentorsLookup = unavailableMentors.reduce<
     Record<string, boolean>
-  >((res, { mentorId }) => {
-    res[mentorId.toString()] = true;
+  >((res, { volunteerId }) => {
+    res[volunteerId.toString()] = true;
 
     return res;
   }, {});
 
   return assignedMentors
-    .map(({ mentor: { id, fullName } }) => ({
+    .map(({ volunteer: { id, fullName } }) => ({
       id,
       fullName: `** ${fullName} (Assigned) **`,
     }))
@@ -181,12 +181,12 @@ export async function addMentorToSessionAsync({
       },
     });
 
-    let mentorSession = await tx.mentorSession.findUnique({
+    let volunteerSession = await tx.volunteerSession.findUnique({
       where: {
-        chapterId_mentorId_attendedOn: {
+        chapterId_volunteerId_attendedOn: {
           chapterId: studentSession.chapterId,
           attendedOn: studentSession.attendedOn,
-          mentorId,
+          volunteerId: mentorId,
         },
       },
       select: {
@@ -194,11 +194,11 @@ export async function addMentorToSessionAsync({
       },
     });
 
-    mentorSession ??= await tx.mentorSession.create({
+    volunteerSession ??= await tx.volunteerSession.create({
       data: {
         chapterId: studentSession.chapterId,
         attendedOn: studentSession.attendedOn,
-        mentorId,
+        volunteerId: mentorId,
       },
       select: {
         id: true,
@@ -209,7 +209,7 @@ export async function addMentorToSessionAsync({
       data: {
         chapterId: studentSession.chapterId,
         attendedOn: studentSession.attendedOn,
-        mentorSessionId: mentorSession.id,
+        volunteerSessionId: volunteerSession.id,
         studentSessionId: studentSession.id,
       },
     });
@@ -225,7 +225,7 @@ export async function removeSessionAsync(sessionId: number) {
       id: true,
       chapterId: true,
       attendedOn: true,
-      mentorSessionId: true,
+      volunteerSessionId: true,
       studentSessionId: true,
       isCancelled: true,
       studentSession: {
@@ -249,14 +249,14 @@ export async function removeSessionAsync(sessionId: number) {
 
     const sessionsForMentorCount = await tx.session.count({
       where: {
-        mentorSessionId: session.mentorSessionId,
+        volunteerSessionId: session.volunteerSessionId,
       },
     });
 
     if (sessionsForMentorCount === 0) {
-      await tx.mentorSession.delete({
+      await tx.volunteerSession.delete({
         where: {
-          id: session.mentorSessionId,
+          id: session.volunteerSessionId,
         },
       });
     }

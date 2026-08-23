@@ -1,4 +1,4 @@
-import type { ImportedHistory, Mentor } from "~/prisma/client";
+import type { ImportedHistory, Volunteer } from "~/prisma/client";
 import type { SpreadsheetUser } from "~/models/spreadsheet";
 
 import { Readable } from "node:stream";
@@ -20,14 +20,14 @@ export async function readExcelFileAsync(file: File) {
 }
 
 export async function getCurrentMentorsAsync() {
-  return await prisma.mentor.findMany({
+  return await prisma.volunteer.findMany({
     select: {
       email: true,
     },
   });
 }
 
-export type UserHistory = Mentor & {
+export type UserHistory = Volunteer & {
   importedHistory: ImportedHistory | null;
 };
 
@@ -90,7 +90,7 @@ export async function importSpreadsheetMentorsAsync(
         error += "Induction Date is invalid.\n";
       }
 
-      const mentor = await tx.mentor.create({
+      const volunteer = await tx.volunteer.create({
         include: {
           importedHistory: true,
         },
@@ -224,7 +224,7 @@ export async function importSpreadsheetMentorsAsync(
         },
       });
 
-      users.push(mentor);
+      users.push(volunteer);
     }
   });
 

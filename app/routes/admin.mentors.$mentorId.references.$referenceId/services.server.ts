@@ -22,10 +22,10 @@ export interface ReferenceUpdateCommand {
   generalComment?: string | null;
 }
 
-export async function getUserByIdAsync(mentorId: number) {
-  return await prisma.mentor.findUniqueOrThrow({
+export async function getUserByIdAsync(volunteerId: number) {
+  return await prisma.volunteer.findUniqueOrThrow({
     where: {
-      id: mentorId,
+      id: volunteerId,
     },
     select: {
       id: true,
@@ -35,12 +35,12 @@ export async function getUserByIdAsync(mentorId: number) {
 }
 
 export async function getUserWithReferenceByIdAsync(
-  mentorId: number,
+  volunteerId: number,
   referenceId: number,
 ) {
-  return await prisma.mentor.findUniqueOrThrow({
+  return await prisma.volunteer.findUniqueOrThrow({
     where: {
-      id: mentorId,
+      id: volunteerId,
     },
     select: {
       id: true,
@@ -55,14 +55,14 @@ export async function getUserWithReferenceByIdAsync(
 }
 
 export async function updateReferenceByIdAsync(
-  mentorId: number,
+  volunteerId: number,
   referenceId: number | undefined,
   data: ReferenceUpdateCommand,
 ) {
   if (referenceId === undefined) {
     return await prisma.reference.create({
       data: {
-        mentorId,
+        volunteerId,
         firstName: data.firstName,
         lastName: data.lastName,
         mobile: data.mobile,

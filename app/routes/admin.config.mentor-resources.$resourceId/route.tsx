@@ -16,10 +16,10 @@ import {
 export async function loader({ params }: Route.LoaderArgs) {
   if (params.resourceId === "new") {
     return {
-      mentorResource: {
+      volunteerResource: {
         id: 0,
         label: "",
-        mentorResource: [
+        volunteerResource: [
           {
             id: 0,
             label: "",
@@ -32,11 +32,11 @@ export async function loader({ params }: Route.LoaderArgs) {
     };
   }
 
-  const mentorResource = await getMentorResourceByIdAsync(
+  const volunteerResource = await getMentorResourceByIdAsync(
     Number(params.resourceId),
   );
 
-  return { mentorResource };
+  return { volunteerResource };
 }
 
 export async function action({ request, params }: Route.ActionArgs) {
@@ -60,13 +60,13 @@ export async function action({ request, params }: Route.ActionArgs) {
 }
 
 export default function Index({
-  loaderData: { mentorResource },
+  loaderData: { volunteerResource },
 }: Route.ComponentProps) {
   const { Form, submit, state, data } = useFetcher<{
     successMessage: string;
     errorMessage: string;
   }>();
-  const [resource, setResource] = useState(mentorResource);
+  const [resource, setResource] = useState(volunteerResource);
   const draggingRowIndexRef = useRef<number | null>(null);
 
   const onDragStart = (e: React.DragEvent<HTMLLIElement>, index: number) => {
@@ -81,12 +81,12 @@ export default function Index({
       return;
     }
 
-    const newList = [...resource.mentorResource];
+    const newList = [...resource.volunteerResource];
     const targetItem = newList.splice(draggingRowIndexRef.current!, 1)[0];
     newList.splice(index, 0, targetItem);
 
     draggingRowIndexRef.current = index;
-    setResource({ ...resource, mentorResource: newList });
+    setResource({ ...resource, volunteerResource: newList });
   };
 
   const onDragEnd = () => {
@@ -98,25 +98,27 @@ export default function Index({
 
     const formData = new FormData(e.currentTarget);
 
-    const mentorResourceJsonData = resource.mentorResource.map((_, index) => {
-      const description = formData
-        .get(`resource[${index}]['description']`)
-        ?.toString();
+    const volunteerResourceJsonData = resource.volunteerResource.map(
+      (_, index) => {
+        const description = formData
+          .get(`resource[${index}]['description']`)
+          ?.toString();
 
-      return {
-        id: Number(formData.get(`resource[${index}]['id']`)!.toString()),
-        label: formData.get(`resource[${index}]['label']`)!.toString(),
-        url: formData.get(`resource[${index}]['url']`)!.toString(),
-        description: isStringNullOrEmpty(description) ? null : description,
-        order: index + 1,
-      };
-    });
+        return {
+          id: Number(formData.get(`resource[${index}]['id']`)!.toString()),
+          label: formData.get(`resource[${index}]['label']`)!.toString(),
+          url: formData.get(`resource[${index}]['url']`)!.toString(),
+          description: isStringNullOrEmpty(description) ? null : description,
+          order: index + 1,
+        };
+      },
+    );
 
     void submit(
       {
         id: resource.id,
         label: formData.get("label")!.toString(),
-        mentorResource: mentorResourceJsonData,
+        volunteerResource: volunteerResourceJsonData,
       },
       { method: "POST", encType: "application/json" },
     );
@@ -129,21 +131,21 @@ export default function Index({
 
     setResource((prev) => ({
       ...prev,
-      mentorResource: prev.mentorResource.filter((_, i) => i !== index),
+      volunteerResource: prev.volunteerResource.filter((_, i) => i !== index),
     }));
   };
 
   const onAddNewBtnClick = () => {
     setResource((prev) => ({
       ...prev,
-      mentorResource: [
-        ...prev.mentorResource,
+      volunteerResource: [
+        ...prev.volunteerResource,
         {
           id: 0,
           label: "",
           url: "",
           description: "",
-          order: prev.mentorResource.length + 1,
+          order: prev.volunteerResource.length + 1,
         },
       ],
     }));
@@ -181,7 +183,7 @@ export default function Index({
             </div>
 
             <ul>
-              {resource.mentorResource.map(
+              {resource.volunteerResource.map(
                 ({ id, label, url, description }, index) => (
                   <li
                     key={id}

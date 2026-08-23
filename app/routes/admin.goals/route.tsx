@@ -261,7 +261,7 @@ export default function Index({
                   id,
                   student,
                   chapter,
-                  mentor,
+                  volunteer,
                   title,
                   isAchieved,
                   endDate,
@@ -270,7 +270,7 @@ export default function Index({
                     <td className="p-2">{title}</td>
                     <td className="p-2">{chapter.name}</td>
                     <td className="p-2">{student.fullName}</td>
-                    <td className="p-2">{mentor.fullName}</td>
+                    <td className="p-2">{volunteer.fullName}</td>
                     <td className="hidden p-2 sm:table-cell">
                       {endDate ? dayjs(endDate).format("MMMM D, YYYY") : "-"}
                     </td>

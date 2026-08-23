@@ -1,11 +1,11 @@
 import { prisma } from "~/db.server";
 
 export async function getMentorResourcesAsync() {
-  return await prisma.mentorResourceCategory.findMany({
+  return await prisma.volunteerResourceCategory.findMany({
     select: {
       id: true,
       label: true,
-      mentorResource: {
+      volunteerResource: {
         select: {
           id: true,
           label: true,

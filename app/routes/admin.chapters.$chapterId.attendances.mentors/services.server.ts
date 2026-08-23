@@ -11,11 +11,11 @@ export async function getAttendancesAsync(
   sessionDate: string,
   searchTerm: string | null,
 ) {
-  return await prisma.mentorAttendance.findMany({
+  return await prisma.volunteerAttendance.findMany({
     where: {
       chapterId,
       attendedOn: dayjs.utc(sessionDate, "YYYY-MM-DD").toDate(),
-      mentor: isStringNullOrEmpty(searchTerm)
+      volunteer: isStringNullOrEmpty(searchTerm)
         ? undefined
         : {
             fullName: {
@@ -26,7 +26,7 @@ export async function getAttendancesAsync(
     select: {
       id: true,
       attendedOn: true,
-      mentor: {
+      volunteer: {
         select: {
           fullName: true,
         },

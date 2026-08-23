@@ -18,9 +18,9 @@ export async function getSessionByIdAsync(sessionId: number) {
       reportFeedback: true,
       completedOn: true,
       isCancelled: true,
-      mentorSession: {
+      volunteerSession: {
         select: {
-          mentor: {
+          volunteer: {
             select: {
               id: true,
               fullName: true,
@@ -60,9 +60,9 @@ export async function saveReportAsync(
     select: {
       id: true,
       attendedOn: true,
-      mentorSession: {
+      volunteerSession: {
         select: {
-          mentor: {
+          volunteer: {
             select: {
               id: true,
               fullName: true,

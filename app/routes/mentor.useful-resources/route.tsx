@@ -17,12 +17,12 @@ export default function Index({
     <>
       <Title>Useful resources</Title>
 
-      {mentorResources.map(({ id, label, mentorResource }) => (
+      {mentorResources.map(({ id, label, volunteerResource }) => (
         <Fragment key={id}>
           <SubTitle>{label}</SubTitle>
 
           <ul className="m-4 list-inside list-disc">
-            {mentorResource.map(({ id, label, description, url }) => (
+            {volunteerResource.map(({ id, label, description, url }) => (
               <li key={id} className="mb-2">
                 <a className="link" href={url} target="_blank" rel="noreferrer">
                   {label}

@@ -49,7 +49,7 @@ export async function getTotalMentorsAsync(
   chapterId: number | null,
   selectedTerm: Term | null,
 ) {
-  return await prisma.mentor.count({
+  return await prisma.volunteer.count({
     where: {
       endDate: null,
       chapterId: chapterId ?? undefined,
@@ -87,7 +87,7 @@ export async function getIncompleteMentorsAsync(
           pc.reminderSentAt policeCheckReminderSentAt,
           wcc.expiryDate wwccheckExpiryDate,
           wcc.reminderSentAt wwccheckReminderSent,
-          (SELECT COUNT(r.mentorId) FROM Reference r WHERE r.mentorId = u.id GROUP BY r.mentorId) as count,
+          (SELECT COUNT(r.volunteerId) FROM Reference r WHERE r.volunteerId = u.id GROUP BY r.volunteerId) as count,
           ap.id approvalbymrcId,
           p.id eoiprofileId,
           pc.id policecheckId,
@@ -95,14 +95,14 @@ export async function getIncompleteMentorsAsync(
           wc.id welcomecallId,
           i.id inductionId,
           c.id chapterId
-        FROM Mentor u
+        FROM Volunteer u
         INNER JOIN Chapter c ON c.id = u.chapterId
-        LEFT JOIN ApprovalbyMRC ap ON ap.mentorId = u.id
-        LEFT JOIN EoIProfile p ON p.mentorId = u.id
-        LEFT JOIN PoliceCheck pc ON pc.mentorId = u.id
-        LEFT JOIN WWCCheck wcc ON wcc.mentorId = u.id
-        LEFT JOIN WelcomeCall wc ON wc.mentorId = u.id
-        LEFT JOIN Induction i ON i.mentorId = u.id
+        LEFT JOIN ApprovalbyMRC ap ON ap.volunteerId = u.id
+        LEFT JOIN EoIProfile p ON p.volunteerId = u.id
+        LEFT JOIN PoliceCheck pc ON pc.volunteerId = u.id
+        LEFT JOIN WWCCheck wcc ON wcc.volunteerId = u.id
+        LEFT JOIN WelcomeCall wc ON wc.volunteerId = u.id
+        LEFT JOIN Induction i ON i.volunteerId = u.id
     ) as s
     WHERE endDate IS NULL
       AND ${chapterId ? Prisma.sql`chapterId = ${chapterId}` : "1=1"}
@@ -149,7 +149,7 @@ export async function getStudentsWithoutMentorAsync(
   const countQuery = await prisma.$queryRaw<{ count: number }[]>`
     SELECT COUNT(DISTINCT s.id) AS count
     FROM Student AS s
-    LEFT JOIN MentorToStudentAssignement AS m ON s.id = m.studentId
+    LEFT JOIN VolunteerToStudentAssignement AS m ON s.id = m.studentId
     WHERE m.studentId IS NULL
       AND s.endDate IS NULL
       AND ${chapterId ? Prisma.sql`s.chapterId = ${chapterId}` : "1=1"}
@@ -167,7 +167,7 @@ export async function getMentorsPerMonth(
   chapterId: number | null,
   selectedTerm: Term | null,
 ) {
-  const mentors = await prisma.mentor.findMany({
+  const mentors = await prisma.volunteer.findMany({
     select: {
       createdAt: true,
     },
@@ -302,8 +302,8 @@ export async function sessionsStatsAsync(
       COUNT(*) sessionCount,
       COUNT(s.report) reportCount,
       MIN(s.attendedOn) minAttendedOn
-    FROM MentorSession ms
-    INNER JOIN Session s ON s.mentorSessionId = ms.id
+    FROM VolunteerSession ms
+    INNER JOIN Session s ON s.volunteerSessionId = ms.id
     WHERE ms.status = 'AVAILABLE'
       AND s.attendedOn <= ${dayjs().format("YYYY-MM-DD")}
       AND s.isCancelled = 0
@@ -332,15 +332,15 @@ export async function getMentorSessionAttendances(
 	    SUM(IF(s.cancelledBecauseOf = 'MENTOR' AND s.cancelledReasonId = 1, 1, 0)) cancelledWITHReason,
       SUM(IF(s.cancelledBecauseOf = 'MENTOR' AND s.cancelledReasonId = 2, 1, 0)) cancelledWITHOUTReason,
       COUNT(*)
-    FROM MentorSession ms
-    INNER JOIN Session s ON s.mentorSessionId = ms.id
-    INNER JOIN Mentor m ON m.id = ms.mentorId
+    FROM VolunteerSession ms
+    INNER JOIN Session s ON s.volunteerSessionId = ms.id
+    INNER JOIN Volunteer m ON m.id = ms.volunteerId
     WHERE m.endDate IS NULL
       AND ms.status = 'AVAILABLE'
       AND ${chapterId ? Prisma.sql`ms.chapterId = ${chapterId}` : "1=1"}
       AND ${selectedTerm ? Prisma.sql`s.attendedOn BETWEEN ${selectedTerm.start.format("YYYY-MM-DD")} AND ${selectedTerm.end.format("YYYY-MM-DD")}` : Prisma.sql`s.attendedOn BETWEEN ${dayjs().year(year).startOf("year").format("YYYY-MM-DD")} AND ${dayjs().year(year).endOf("year").format("YYYY-MM-DD")}`}
       AND (s.cancelledBecauseOf = 'MENTOR' OR s.cancelledBecauseOf IS NULL)
-      GROUP BY ms.mentorId, m.fullName
+      GROUP BY ms.volunteerId, m.fullName
     HAVING COUNT(*) > 0`;
 
   if (!mentorSessionAttendances) {

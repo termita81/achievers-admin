@@ -17,7 +17,7 @@ export interface EoiUpdateCommand {
 }
 
 export async function getUserByIdAsync(id: number) {
-  return await prisma.mentor.findUniqueOrThrow({
+  return await prisma.volunteer.findUniqueOrThrow({
     where: {
       id,
     },
@@ -30,15 +30,15 @@ export async function getUserByIdAsync(id: number) {
 }
 
 export async function updateEoiByUserIdAsync(
-  mentorId: number,
+  volunteerId: number,
   data: EoiUpdateCommand,
 ) {
   return await prisma.eoIProfile.upsert({
     where: {
-      mentorId,
+      volunteerId,
     },
     create: {
-      mentorId,
+      volunteerId,
       ...data,
     },
     update: {

@@ -1,7 +1,7 @@
 import { prisma } from "~/db.server";
 
 export async function getUserByIdAsync(id: number) {
-  return await prisma.mentor.findUniqueOrThrow({
+  return await prisma.volunteer.findUniqueOrThrow({
     where: {
       id,
     },
@@ -9,7 +9,7 @@ export async function getUserByIdAsync(id: number) {
       id: true,
       fullName: true,
       endDate: true,
-      mentorNotes: {
+      volunteerNotes: {
         select: {
           note: true,
         },

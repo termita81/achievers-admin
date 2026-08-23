@@ -9,7 +9,7 @@ export async function getWWCCheckReminders(
 
   const checks = await prisma.wWCCheck.findMany({
     where: {
-      mentor: {
+      volunteer: {
         endDate: null,
       },
     },
@@ -17,7 +17,7 @@ export async function getWWCCheckReminders(
       id: true,
       reminderSentAt: true,
       expiryDate: true,
-      mentor: {
+      volunteer: {
         select: {
           id: true,
           fullName: true,
@@ -49,7 +49,7 @@ export async function getWWCCheckReminders(
 export async function getWWCRemindersCount() {
   return await prisma.wWCCheck.count({
     where: {
-      mentor: {
+      volunteer: {
         endDate: null,
       },
     },

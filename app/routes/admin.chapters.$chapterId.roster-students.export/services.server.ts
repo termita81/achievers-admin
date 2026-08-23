@@ -89,8 +89,8 @@ export async function getStudentsAsync(
       u.fullName AS mentorFullName
     FROM StudentSession ss
     LEFT JOIN Session sa ON sa.studentSessionId = ss.id
-    LEFT JOIN MentorSession ms ON ms.id = sa.mentorSessionId
-    LEFT JOIN Mentor u ON u.id = ms.mentorId
+    LEFT JOIN VolunteerSession ms ON ms.id = sa.mentorSessionId
+    LEFT JOIN Volunteer u ON u.id = ms.volunteerId
     WHERE ss.chapterId = ${chapterId}
       AND ss.attendedOn BETWEEN ${term.start.utc().format("YYYY-MM-DD")} AND ${term.end.utc().format("YYYY-MM-DD")}`;
 

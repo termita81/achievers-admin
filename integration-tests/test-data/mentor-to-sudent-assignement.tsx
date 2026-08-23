@@ -7,36 +7,36 @@ export async function assignMentorsToStudentsAsync(
     "$connect" | "$disconnect" | "$on" | "$transaction" | "$extends"
   >,
 ) {
-  await tx.mentorToStudentAssignement.deleteMany();
+  await tx.volunteerToStudentAssignement.deleteMany();
 
-  const mentorsAtChapter = await tx.mentor.findMany();
+  const volunteersAtChapter = await tx.volunteer.findMany();
   const studentsAtChapter = await tx.student.findMany();
 
-  await tx.mentorToStudentAssignement.createMany({
+  await tx.volunteerToStudentAssignement.createMany({
     data: [
       {
-        mentorId: mentorsAtChapter[0].id,
+        volunteerId: volunteersAtChapter[0].id,
         studentId: studentsAtChapter[0].id,
         assignedBy: "test",
       },
       {
-        mentorId: mentorsAtChapter[0].id,
+        volunteerId: volunteersAtChapter[0].id,
         studentId: studentsAtChapter[1].id,
         assignedBy: "test",
       },
       {
-        mentorId: mentorsAtChapter[0].id,
+        volunteerId: volunteersAtChapter[0].id,
         studentId: studentsAtChapter[2].id,
         assignedBy: "test",
       },
 
       {
-        mentorId: mentorsAtChapter[1].id,
+        volunteerId: volunteersAtChapter[1].id,
         studentId: studentsAtChapter[1].id,
         assignedBy: "test",
       },
       {
-        mentorId: mentorsAtChapter[2].id,
+        volunteerId: volunteersAtChapter[2].id,
         studentId: studentsAtChapter[2].id,
         assignedBy: "test",
       },

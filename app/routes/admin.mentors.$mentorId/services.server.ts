@@ -33,7 +33,7 @@ export async function getChaptersAsync() {
 }
 
 export async function getUserByIdAsync(id: number) {
-  return await prisma.mentor.findUniqueOrThrow({
+  return await prisma.volunteer.findUniqueOrThrow({
     where: {
       id,
     },
@@ -111,7 +111,7 @@ export async function updateMentorByIdAsync(
   dataUpdate: MentorCommand,
   email?: string,
 ) {
-  await prisma.mentor.update({
+  await prisma.volunteer.update({
     where: {
       id: mentorId,
     },
@@ -125,7 +125,7 @@ export async function updateMentorByIdAsync(
 export async function removeWelcomeCall(mentorId: number) {
   return await prisma.welcomeCall.delete({
     where: {
-      mentorId,
+      volunteerId: mentorId,
     },
   });
 }
@@ -133,7 +133,7 @@ export async function removeWelcomeCall(mentorId: number) {
 export async function removeInduction(mentorId: number) {
   return await prisma.induction.delete({
     where: {
-      mentorId,
+      volunteerId: mentorId,
     },
   });
 }
@@ -141,7 +141,7 @@ export async function removeInduction(mentorId: number) {
 export async function removePoliceCheck(mentorId: number) {
   return await prisma.policeCheck.delete({
     where: {
-      mentorId,
+      volunteerId: mentorId,
     },
   });
 }
@@ -149,7 +149,7 @@ export async function removePoliceCheck(mentorId: number) {
 export async function removeWwccheck(mentorId: number) {
   return await prisma.wWCCheck.delete({
     where: {
-      mentorId,
+      volunteerId: mentorId,
     },
   });
 }
@@ -157,7 +157,7 @@ export async function removeWwccheck(mentorId: number) {
 export async function removeApprovalMrc(mentorId: number) {
   return await prisma.approvalbyMRC.delete({
     where: {
-      mentorId,
+      volunteerId: mentorId,
     },
   });
 }

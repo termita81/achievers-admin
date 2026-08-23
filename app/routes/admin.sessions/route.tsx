@@ -271,7 +271,7 @@ export default function Index({
                     completedOn,
                     signedOffOn,
                     studentSession,
-                    mentorSession,
+                    volunteerSession,
                     isCancelled,
                     chapter,
                   },
@@ -298,7 +298,9 @@ export default function Index({
                       </div>
                     </td>
                     <td className="p-2">{chapter.name}</td>
-                    <td className="p-2">{mentorSession.mentor.fullName}</td>
+                    <td className="p-2">
+                      {volunteerSession.volunteer.fullName}
+                    </td>
                     <td className="p-2">{studentSession.student.fullName}</td>
                     <td className="p-2">
                       {dayjs(attendedOn).format("MMMM D, YYYY")}

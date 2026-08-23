@@ -3,7 +3,7 @@ import { prisma } from "~/db.server";
 export interface ResourceCommand {
   id: number;
   label: string;
-  mentorResource: {
+  volunteerResource: {
     id: number;
     label: string;
     description: string | null;
@@ -13,14 +13,14 @@ export interface ResourceCommand {
 }
 
 export async function getMentorResourceByIdAsync(resourceId: number) {
-  return await prisma.mentorResourceCategory.findUniqueOrThrow({
+  return await prisma.volunteerResourceCategory.findUniqueOrThrow({
     where: {
       id: resourceId,
     },
     select: {
       id: true,
       label: true,
-      mentorResource: {
+      volunteerResource: {
         select: {
           id: true,
           label: true,
@@ -41,12 +41,12 @@ export async function upsertMentorResourcesAsync(
   resource: ResourceCommand,
 ) {
   return await prisma.$transaction(async (tx) => {
-    const upsertedCategory = await tx.mentorResourceCategory.upsert({
+    const upsertedCategory = await tx.volunteerResourceCategory.upsert({
       where: { id: resourceId },
       update: { label: resource.label },
       create: {
         label: resource.label,
-        order: (await tx.mentorResourceCategory.count()) + 1,
+        order: (await tx.volunteerResourceCategory.count()) + 1,
       },
       select: {
         id: true,
@@ -54,8 +54,8 @@ export async function upsertMentorResourcesAsync(
     });
 
     await Promise.all(
-      resource.mentorResource.map((item) =>
-        tx.mentorResource.upsert({
+      resource.volunteerResource.map((item) =>
+        tx.volunteerResource.upsert({
           where: { id: item.id },
           update: {
             label: item.label,
@@ -68,7 +68,7 @@ export async function upsertMentorResourcesAsync(
             description: item.description,
             url: item.url,
             order: item.order,
-            mentorResourceCategoryId: upsertedCategory.id,
+            volunteerResourceCategoryId: upsertedCategory.id,
           },
         }),
       ),

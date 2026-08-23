@@ -32,9 +32,9 @@ export async function getMentorsWithStudentsAsync(
     select: {
       id: true,
       fullName: true,
-      mentorToStudentAssignement: {
+      volunteerToStudentAssignement: {
         select: {
-          mentor: {
+          volunteer: {
             select: {
               id: true,
               fullName: true,
@@ -46,7 +46,7 @@ export async function getMentorsWithStudentsAsync(
     },
     orderBy: {
       fullName: sortCountMentors ? undefined : (sortFullName ?? "asc"),
-      mentorToStudentAssignement: sortCountMentors
+      volunteerToStudentAssignement: sortCountMentors
         ? {
             _count: sortCountMentors,
           }

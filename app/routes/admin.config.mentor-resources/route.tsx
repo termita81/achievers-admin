@@ -150,7 +150,7 @@ export default function Index({
                     />
                   </td>
                   <td className="p-2">{label}</td>
-                  <td className="p-2">{_count.mentorResource}</td>
+                  <td className="p-2">{_count.volunteerResource}</td>
                   <td className="hidden p-2 sm:table-cell" align="right">
                     <StateLink
                       to={`/admin/config/mentor-resources/${id}`}
