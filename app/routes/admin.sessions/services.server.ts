@@ -38,7 +38,7 @@ export async function getAvailabelMentorsAsync(
       SELECT 
         m.id, m.fullName
       FROM Session sa
-      INNER JOIN VolunteerSession ms ON ms.id = sa.mentorSessionId
+      INNER JOIN VolunteerSession ms ON ms.id = sa.volunteerSessionId
       INNER JOIN StudentSession ss ON ss.id = sa.studentSessionId
       INNER JOIN Volunteer m ON m.id = ms.volunteerId
       WHERE ss.studentId = ${studentId} AND ${chapterId ? Prisma.sql`sa.chapterId = ${chapterId}` : "1=1"}
