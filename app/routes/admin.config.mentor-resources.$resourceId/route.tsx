@@ -5,6 +5,7 @@ import { redirect, useFetcher } from "react-router";
 import { useRef, useState } from "react";
 import { BinHalf, FloppyDisk, LineSpace, Plus } from "iconoir-react";
 
+import { trackException } from "~/services/.server";
 import { isStringNullOrEmpty } from "~/services";
 import { Message, Textarea, Title } from "~/components";
 
@@ -44,13 +45,14 @@ export async function action({ request, params }: Route.ActionArgs) {
 
   try {
     const { id } = await upsertMentorResourcesAsync(
-      Number(params.resourceId),
+      params.resourceId === "new" ? 0 : Number(params.resourceId),
       jsonData,
     );
     if (params.resourceId === "new") {
       return redirect(`/admin/config/mentor-resources/${id}`);
     }
-  } catch {
+  } catch (e) {
+    trackException(e as Error);
     return {
       errorMessage: `Category label "${jsonData.label}" already exists. Please choose a different label.`,
     };

@@ -43,7 +43,7 @@ export async function upsertMentorResourcesAsync(
   return await prisma.$transaction(async (tx) => {
     const upsertedCategory = await tx.volunteerResourceCategory.upsert({
       where: { id: resourceId },
-      update: { label: resource.label },
+      update: {},
       create: {
         label: resource.label,
         order: (await tx.volunteerResourceCategory.count()) + 1,
