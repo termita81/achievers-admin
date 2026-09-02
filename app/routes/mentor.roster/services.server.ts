@@ -6,6 +6,7 @@ import utc from "dayjs/plugin/utc";
 import isBetween from "dayjs/plugin/isBetween";
 
 import { prisma } from "~/db.server";
+import { trackException } from "~/services/.server";
 
 dayjs.extend(utc);
 dayjs.extend(isBetween);
@@ -285,7 +286,9 @@ export async function createMentorSession({
   });
 
   if (volunteerSession !== null) {
-    throw new Error();
+    const err = new Error("volunteerSession cannot be null.");
+    trackException(err);
+    throw err;
   }
 
   return await prisma.volunteerSession.create({

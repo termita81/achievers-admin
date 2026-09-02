@@ -22,6 +22,7 @@ import {
 import {
   getLoggedUserInfoAsync,
   getSchoolTermsAsync,
+  trackException,
 } from "~/services/.server";
 import {
   getCurrentTermForDate,
@@ -128,7 +129,9 @@ export async function action({ request }: Route.ActionArgs) {
       const attendedOn = bodyData.get("attendedOn")?.toString();
       const status = bodyData.get("status")?.toString();
       if (attendedOn === undefined || status === undefined) {
-        throw new Error();
+        const err = new Error("AttendedOn and status are required");
+        trackException(err);
+        throw err;
       }
 
       await createMentorSession({
