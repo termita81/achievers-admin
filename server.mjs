@@ -20,6 +20,7 @@ const app = express();
 
 app.use(compression());
 app.disable("x-powered-by");
+app.set("trust proxy", true);
 
 if (DEVELOPMENT) {
   console.log("Starting development server");
